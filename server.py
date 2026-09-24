@@ -87,7 +87,6 @@ def create_handler(catalog: Catalog, wallpapers: list[dict], images: ImageCatalo
                     "operators": len(catalog.by_operator),
                     "wallpapers": len(wallpapers),
                     "portraits": len(images.portraits),
-                    "story_cg": len(images.cg_files),
                     "imported_at": catalog.meta.get("imported_at"),
                     "source": catalog.meta.get("source"),
                 }, "public, max-age=60")
@@ -121,13 +120,6 @@ def create_handler(catalog: Catalog, wallpapers: list[dict], images: ImageCatalo
                     "source": catalog.meta.get("source"),
                     "illustration": images.portrait(line["operator_id"]),
                 }, "public, max-age=3600" if day else "no-store")
-                return
-            if path == "/api/v1/cg/random":
-                cg = images.random_cg()
-                if cg is None:
-                    self.send_json(503, {"error": "cg_catalog_unavailable"})
-                else:
-                    self.send_json(200, {"data": cg})
                 return
             if path == "/api/v1/wallpapers/random":
                 orientation = first("orientation")

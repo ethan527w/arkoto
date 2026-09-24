@@ -1,5 +1,5 @@
 const byId = (id) => document.getElementById(id);
-const state = { mode: "random", timer: null, cg: null };
+const state = { mode: "random", timer: null };
 
 function showPortrait(illustration) {
   const image = byId("quote-portrait");
@@ -55,46 +55,6 @@ async function fetchQuote() {
   }
 }
 
-async function fetchCg() {
-  state.cg = null;
-  const image = byId("cg-image");
-  const cover = byId("cg-cover");
-  image.onload = null;
-  image.onerror = null;
-  image.hidden = true;
-  image.removeAttribute("src");
-  cover.hidden = false;
-  byId("reveal-cg").disabled = true;
-  byId("cg-filename").textContent = "正在读取图片索引…";
-  byId("next-cg").disabled = true;
-  try {
-    const response = await fetch("/api/v1/cg/random");
-    const result = await response.json();
-    if (!response.ok) throw new Error("剧情图片暂不可用");
-    state.cg = result.data;
-    byId("cg-source").href = result.data.source;
-    byId("cg-filename").textContent = result.data.filename;
-    byId("reveal-cg").disabled = false;
-    byId("reveal-cg").textContent = "显示图片 ↗";
-  } catch (error) {
-    byId("cg-filename").textContent = error.message;
-  } finally {
-    byId("next-cg").disabled = false;
-  }
-}
-
-function revealCg() {
-  if (!state.cg) return;
-  const image = byId("cg-image");
-  const cover = byId("cg-cover");
-  const button = byId("reveal-cg");
-  button.disabled = true;
-  button.textContent = "正在载入…";
-  image.onload = () => { image.hidden = false; cover.hidden = true; button.disabled = false; };
-  image.onerror = () => { button.disabled = false; button.textContent = "加载失败，重试 ↗"; };
-  image.src = state.cg.url;
-}
-
 async function loadOperators(query = "") {
   try {
     const response = await fetch(`/api/v1/operators?q=${encodeURIComponent(query)}&limit=30`);
@@ -133,7 +93,6 @@ async function loadPageData() {
   }
   await loadOperators();
   await fetchQuote();
-  fetchCg();
 }
 
 byId("mode-random").addEventListener("click", () => {
@@ -152,8 +111,6 @@ byId("mode-today").addEventListener("click", () => {
 });
 byId("fetch-quote").addEventListener("click", fetchQuote);
 byId("next-quote").addEventListener("click", fetchQuote);
-byId("next-cg").addEventListener("click", fetchCg);
-byId("reveal-cg").addEventListener("click", revealCg);
 byId("title-select").addEventListener("change", updateEndpoint);
 byId("operator-input").addEventListener("input", (event) => {
   updateEndpoint();

@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#0c1115" />
+    <meta name="description" content="Arkoto API 文档：随机与每日明日方舟干员台词、干员和场景筛选、响应字段与接入示例。" />
+    <link rel="canonical" href="https://arkoto.me/docs" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="/styles.css" />
+    <link rel="stylesheet" href="/docs.css" />
+    <title>API 文档 — Arkoto</title>
+  </head>
+  <body>
+    <header class="site-header wrap">
+      <a class="brand" href="/" aria-label="Arkoto 首页">
+        <span class="brand-mark" aria-hidden="true"><span></span><span></span><span></span></span>
+        <span class="brand-type">ARKOTO<small>TERRA · IN WORDS</small></span>
+      </a>
+      <nav class="nav" aria-label="主导航"><a href="/">返回首页</a><a href="/#explore">语录探索</a></nav>
+      <a class="header-github" href="https://github.com/ethan527w/arkoto" target="_blank" rel="noopener noreferrer">GitHub <span aria-hidden="true">↗</span></a>
+    </header>
+
+    <main class="docs-shell wrap">
+      <div class="docs-hero">
+        <span class="section-number">ARKOTO / API REFERENCE</span>
+        <h1>接口文档<span> / v1</span></h1>
+        <p>把来自泰拉的台词放进你的网站、机器人或桌面。所有接口均为公开读取接口，返回 JSON，无需 API 密钥。</p>
+        <div class="docs-base"><span>BASE URL</span><code>https://arkoto.me/api/v1</code></div>
+      </div>
+
+      <div class="docs-grid">
+        <aside class="docs-toc" aria-label="文档目录">
+          <strong>目录 / CONTENTS</strong>
+          <a href="#quickstart">快速接入</a>
+          <a href="#quotes">获取台词</a>
+          <a href="#filters">筛选参数</a>
+          <a href="#response">响应字段</a>
+          <a href="#lookup">查询干员与场景</a>
+          <a href="#errors">错误与使用说明</a>
+        </aside>
+
+        <div class="docs-content">
+          <section id="quickstart" class="docs-section">
+            <span class="docs-number">01 / START</span>
+            <h2>快速接入</h2>
+            <p>发起 GET 请求即可获取台词。浏览器页面可以直接使用 <code>fetch</code>；跨域请求已开放。</p>
+            <pre><code>const response = await fetch("https://arkoto.me/api/v1/quotes/random");
+if (!response.ok) throw new Error(`Arkoto: ${response.status}`);
+const quote = await response.json();
+document.querySelector("#quote").textContent =
+  `${quote.content} —— ${quote.operator.name}`;</code></pre>
+            <p>命令行可以用：</p>
+            <pre><code>curl 'https://arkoto.me/api/v1/quotes/random'</code></pre>
+          </section>
+
+          <section id="quotes" class="docs-section">
+            <span class="docs-number">02 / QUOTES</span>
+            <h2>获取台词</h2>
+            <div class="endpoint"><span>GET</span><code>/api/v1/quotes/random</code><a href="/api/v1/quotes/random" target="_blank" rel="noopener noreferrer">打开 ↗</a></div>
+            <p>每次请求从符合筛选条件的台词中随机取一条。</p>
+            <div class="endpoint"><span>GET</span><code>/api/v1/quotes/today</code><a href="/api/v1/quotes/today" target="_blank" rel="noopener noreferrer">打开 ↗</a></div>
+            <p>按北京时间选取当天台词。同一天、同一组筛选条件会得到相同的台词；更换日期或数据快照后可能改变。</p>
+          </section>
+
+          <section id="filters" class="docs-section">
+            <span class="docs-number">03 / FILTERS</span>
+            <h2>筛选参数</h2>
+            <p>两个台词接口都接受以下可选查询参数，也可以组合使用：</p>
+            <div class="docs-table-wrap"><table><thead><tr><th>参数</th><th>含义</th><th>示例</th></tr></thead><tbody>
+              <tr><td><code>operator</code></td><td>干员名称或 ID，精确匹配</td><td><code>阿米娅</code></td></tr>
+              <tr><td><code>title</code></td><td>台词场景名称，精确匹配</td><td><code>任命助理</code></td></tr>
+            </tbody></table></div>
+            <pre><code># 随机获取阿米娅的台词
+curl --get 'https://arkoto.me/api/v1/quotes/random' \
+  --data-urlencode 'operator=阿米娅'
+
+# 每天固定获取阿米娅的「任命助理」台词
+curl --get 'https://arkoto.me/api/v1/quotes/today' \
+  --data-urlencode 'operator=阿米娅' \
+  --data-urlencode 'title=任命助理'</code></pre>
+            <p>在 JavaScript 中用 <code>URLSearchParams</code> 编码中文参数。没有匹配结果时返回 <code>404</code>。</p>
+          </section>
+
+          <section id="response" class="docs-section">
+            <span class="docs-number">04 / RESPONSE</span>
+            <h2>响应字段</h2>
+            <pre><code>{
+  "id": "台词 ID",
+  "content": "台词正文",
+  "operator": { "id": "干员 ID", "name": "干员名称" },
+  "title": "任命助理",
+  "edition": "CN",
+  "date": null,
+  "source": "游戏数据来源地址",
+  "illustration": {
+    "type": "operator_portrait",
+    "url": "立绘图片地址",
+    "source": "立绘来源地址",
+    "filename": "图片文件名"
+  }
+}</code></pre>
+            <div class="docs-table-wrap"><table><thead><tr><th>字段</th><th>说明</th></tr></thead><tbody>
+              <tr><td><code>content</code></td><td>可以直接显示的台词文本</td></tr>
+              <tr><td><code>operator</code> / <code>title</code></td><td>干员和台词场景</td></tr>
+              <tr><td><code>edition</code></td><td>当前为国服数据 <code>CN</code></td></tr>
+              <tr><td><code>date</code></td><td>每日台词为北京时间日期；随机台词为 <code>null</code></td></tr>
+              <tr><td><code>illustration</code></td><td>对应干员立绘信息；缺图时为 <code>null</code>。图片由第三方来源托管</td></tr>
+              <tr><td><code>source</code></td><td>台词数据来源</td></tr>
+            </tbody></table></div>
+          </section>
+
+          <section id="lookup" class="docs-section">
+            <span class="docs-number">05 / DISCOVERY</span>
+            <h2>查询干员与场景</h2>
+            <div class="endpoint"><span>GET</span><code>/api/v1/operators?q=阿米娅&amp;limit=20</code><a href="/api/v1/operators?q=%E9%98%BF%E7%B1%B3%E5%A8%85&amp;limit=20" target="_blank" rel="noopener noreferrer">打开 ↗</a></div>
+            <p>按名称搜索干员，返回 <code>{ "data": [...] }</code>。<code>q</code> 是可选的名称片段；<code>limit</code> 默认为 50，范围为 1–200，超出范围会被收敛到边界。</p>
+            <div class="endpoint"><span>GET</span><code>/api/v1/categories</code><a href="/api/v1/categories" target="_blank" rel="noopener noreferrer">打开 ↗</a></div>
+            <p>返回场景名称和各场景台词数量，结构为 <code>{ "data": [{ "title": "任命助理", "line_count": 483 }, ...] }</code>。将 <code>title</code> 传给台词接口即可按场景筛选。</p>
+            <div class="endpoint"><span>GET</span><code>/api/v1/status</code><a href="/api/v1/status" target="_blank" rel="noopener noreferrer">打开 ↗</a></div>
+            <p>查看台词、干员与立绘数量，以及 <code>imported_at</code> 数据同步时间。</p>
+          </section>
+
+          <section id="errors" class="docs-section">
+            <span class="docs-number">06 / NOTES</span>
+            <h2>错误与使用说明</h2>
+            <div class="docs-table-wrap"><table><thead><tr><th>状态码</th><th>说明</th></tr></thead><tbody>
+              <tr><td><code>200</code></td><td>请求成功</td></tr>
+              <tr><td><code>400</code></td><td>参数格式无效，例如非整数的 <code>limit</code></td></tr>
+              <tr><td><code>404</code></td><td>找不到符合筛选条件的台词或接口</td></tr>
+              <tr><td><code>405</code></td><td>请求方法不支持</td></tr>
+              <tr><td><code>503</code></td><td>服务或数据暂不可用</td></tr>
+            </tbody></table></div>
+            <p>错误响应通常包含 <code>error</code>，部分还包含 <code>message</code>。客户端应检查 HTTP 状态码。接口支持 <code>GET</code>、<code>HEAD</code>、<code>OPTIONS</code> 和跨域读取。</p>
+            <p>Arkoto 是非官方玩家项目。引用台词或展示立绘时，请保留来源信息并自行确认相关内容的使用范围。公开接口与第三方图片来源均未提供可用性保证。</p>
+          </section>
+        </div>
+      </div>
+    </main>
+
+    <footer class="site-footer"><div class="wrap footer-grid"><div><strong>ARKOTO</strong><p>一条来自泰拉的讯息。</p></div><div>本站为非官方玩家项目。<br />《明日方舟》相关内容归其权利人所有。</div><a href="/">返回首页 ↑</a></div></footer>
+  </body>
+</html>
