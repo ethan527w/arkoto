@@ -3,6 +3,11 @@
   "name": "arkoto",
   "main": "./src/worker.js",
   "compatibility_date": "2026-09-24",
+  "workers_dev": true,
+  "routes": [
+    { "pattern": "arkoto.me", "custom_domain": true },
+    { "pattern": "www.arkoto.me", "custom_domain": true }
+  ],
   "assets": {
     "directory": "./public",
     "binding": "ASSETS",
