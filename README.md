@@ -6,7 +6,7 @@
 
 《明日方舟》干员台词、对应立绘与剧情 CG 的非官方 API 原型。
 
-[在线体验](https://arkoto.arkoto.workers.dev/) · [状态接口](https://arkoto.arkoto.workers.dev/api/v1/status)
+[在线体验](https://arkoto.me/) · [状态接口](https://arkoto.me/api/v1/status)
 
 [快速开始](#快速开始) · [接口一览](#接口一览) · [Cloudflare 部署](#cloudflare-部署) · [数据与使用说明](#数据与使用说明)
 
@@ -77,7 +77,7 @@ curl 'http://127.0.0.1:8765/api/v1/quotes/random?operator=%E9%98%BF%E7%B1%B3%E5%
 
 ## Cloudflare 部署
 
-项目已部署到 [arkoto.arkoto.workers.dev](https://arkoto.arkoto.workers.dev/)，使用 **Workers + 静态资源 + D1**，无需另外租 VPS。Workers 托管网页和 API，D1 存台词；图片仍由来源镜像按需加载。完整步骤见 [Cloudflare 部署指南](docs/cloudflare.md)。购买 `arkoto.me` 后可再绑定自定义域名。
+项目部署在 [arkoto.me](https://arkoto.me/) 和 [www.arkoto.me](https://www.arkoto.me/)，备用地址为 [arkoto.arkoto.workers.dev](https://arkoto.arkoto.workers.dev/)。使用 **Workers + 静态资源 + D1**，无需另外租 VPS。Workers 托管网页和 API，D1 存台词；图片仍由来源镜像按需加载。完整步骤见 [Cloudflare 部署指南](docs/cloudflare.md)。
 
 本地模拟 Cloudflare 环境：
 

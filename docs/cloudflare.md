@@ -2,7 +2,7 @@
 
 Arkoto 使用一个 Cloudflare Worker 同时提供静态网页与 API，D1 保存台词。**不需要 VPS**。下面的步骤会创建公开可访问的服务；部署前先确认《明日方舟》文字和图片的使用范围。
 
-项目现已部署在 [arkoto.arkoto.workers.dev](https://arkoto.arkoto.workers.dev/)；本指南也可用于重新部署或迁移到其他 Cloudflare 账户。
+项目已绑定 [arkoto.me](https://arkoto.me/) 和 [www.arkoto.me](https://www.arkoto.me/)；[arkoto.arkoto.workers.dev](https://arkoto.arkoto.workers.dev/) 保留为备用地址。本指南也可用于重新部署或迁移到其他 Cloudflare 账户。
 
 ## 1. 准备本地数据
 
@@ -33,20 +33,20 @@ npx wrangler d1 execute arkoto --remote --command='SELECT COUNT(*) AS total FROM
 npm run deploy
 ```
 
-导入完成后应看到 **18,237** 行左右（以后随国服数据更新）。部署命令会输出一个 `*.workers.dev` 地址，先检查 `/api/v1/status` 和网页。Cloudflare 的 [D1 导入文档](https://developers.cloudflare.com/d1/best-practices/import-export-data/)说明了 `d1 execute --file` 的工作方式。
+导入完成后应看到 **18,237** 行左右（以后随国服数据更新）。部署命令会输出 `arkoto.me`、`www.arkoto.me` 和 `*.workers.dev` 地址，检查 `/api/v1/status` 和网页。Cloudflare 的 [D1 导入文档](https://developers.cloudflare.com/d1/best-practices/import-export-data/)说明了 `d1 execute --file` 的工作方式。
 
 > [!CAUTION]
 > 导出的 SQL 会先删除旧 `quotes` 表，再重新导入。初次部署可直接使用；以后更新公开服务前，应先用 `npx wrangler d1 export arkoto --remote --output=data/generated/backup.sql` 备份，并安排维护窗口。更新索引后还需要重新 `npm run deploy`，保持 Worker 索引和 D1 数据同步。
 
 ## 4. 绑定 `arkoto.me`
 
-域名可在 GoDaddy 购买。买好后：
+当前域名在 GoDaddy 注册，Cloudflare 托管 DNS。重新绑定或迁移时：
 
 1. 在 Cloudflare 添加 `arkoto.me` 站点，记下 Cloudflare 分配的两个 nameserver。
 2. 到 GoDaddy 把域名 nameserver 改为这两个地址，等待 Cloudflare 显示站点已激活。操作参考 [Cloudflare 域名接入文档](https://developers.cloudflare.com/dns/zone-setups/full-setup/setup/)。
-3. 在 Cloudflare 的 **Workers & Pages → Arkoto Worker → Settings → Domains & Routes → Add → Custom Domain** 添加 `arkoto.me`。Cloudflare 会创建所需 DNS 记录并申请 HTTPS 证书；参考 [Custom Domains 文档](https://developers.cloudflare.com/workers/configuration/routing/custom-domains/)。
+3. 在 `wrangler.jsonc` 的 `routes` 中配置 `arkoto.me` 和 `www.arkoto.me` 的 Custom Domain，运行 `npm run deploy`。Cloudflare 会创建所需 DNS 记录并申请 HTTPS 证书；参考 [Custom Domains 文档](https://developers.cloudflare.com/workers/configuration/routing/custom-domains/)。
 
-如果之后还要 `www.arkoto.me`，可再添加一个 Custom Domain 并决定是否重定向到主域名。
+目前两个域名都直接提供相同网页与 API。修改域名后，先等待证书签发并验证 HTTPS，再启用 Cloudflare 的 **Always Use HTTPS**。
 
 ## 上线前检查
 
