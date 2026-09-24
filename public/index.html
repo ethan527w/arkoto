@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#0c1115" />
+    <meta name="description" content="Arkoto 为你的页面带来一条来自泰拉的台词。探索干员语录与简洁的接入接口。" />
+    <title>Arkoto — 泰拉语录接口</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="/styles.css" />
+    <script src="/app.js" defer></script>
+  </head>
+  <body>
+    <div class="page-glow" aria-hidden="true"></div>
+    <header class="site-header wrap">
+      <a class="brand" href="#top" aria-label="Arkoto 首页">
+        <span class="brand-mark" aria-hidden="true"><span></span><span></span><span></span></span>
+        <span class="brand-type">ARKOTO<small>TERRA · IN WORDS</small></span>
+      </a>
+      <nav class="nav" aria-label="主导航">
+        <a href="#explore">语录探索</a>
+        <a href="#api">开放接口</a>
+        <a href="#cg">剧情 CG</a>
+      </nav>
+      <span class="header-status"><span class="status-dot"></span> 本地预览版</span>
+    </header>
+
+    <main id="top">
+      <section class="hero wrap">
+        <div class="hero-copy">
+          <div class="eyebrow"><span class="eyebrow-line"></span> ARKOTO / 001 — TRANSMISSION ONLINE</div>
+          <h1>总有一句话，<br /><em>来自泰拉。</em></h1>
+          <p>让干员的声音，成为你的网站、机器人或桌面一角的日常。一次请求，就能遇见一段新的故事。</p>
+          <div class="hero-actions">
+            <a class="button button-primary" href="#explore">探索台词 <span aria-hidden="true">↗</span></a>
+            <a class="button button-secondary" href="#api">查看接口 <span aria-hidden="true">→</span></a>
+          </div>
+        </div>
+        <div class="hero-art" aria-hidden="true">
+          <div class="orbital orbital-outer"></div>
+          <div class="orbital orbital-inner"></div>
+          <div class="hero-disc"><span class="disc-north">A</span><span class="disc-south">K</span></div>
+          <div class="orbit-label orbit-label-top">ORIGIN / TERRA</div>
+          <div class="orbit-label orbit-label-bottom">SIGNAL 001.09</div>
+          <div class="crosshair crosshair-one">+</div><div class="crosshair crosshair-two">+</div>
+        </div>
+        <div class="hero-index" aria-hidden="true">01 / 03</div>
+      </section>
+
+      <section class="signal-strip" aria-label="数据概览">
+        <div class="wrap signal-grid">
+          <div><span class="signal-icon">✦</span><strong id="line-count">—</strong><small>收录台词</small></div>
+          <div><span class="signal-icon">◇</span><strong id="operator-count">—</strong><small>位干员</small></div>
+          <div><span class="signal-icon">◷</span><strong>每日一条</strong><small>同一天固定推荐</small></div>
+          <div class="strip-caption">来自游戏数据的声音档案 <span>↘</span></div>
+        </div>
+      </section>
+
+      <section class="section wrap explore" id="explore">
+        <div class="section-heading">
+          <div><span class="section-number">01 — VOICE ARCHIVE</span><h2>打开一段通讯</h2></div>
+          <p>随机邂逅，或选定你想听见的名字。</p>
+        </div>
+        <div class="explore-grid">
+          <article class="quote-card">
+            <img class="quote-portrait" id="quote-portrait" alt="" hidden />
+            <div class="quote-top"><span><i class="live-dot"></i> 当前信号</span><span id="quote-mode-label">随机台词</span></div>
+            <div class="quote-symbol" aria-hidden="true">“</div>
+            <blockquote id="quote-content" aria-live="polite">正在接收来自泰拉的讯息……</blockquote>
+            <div class="quote-bottom">
+              <div><strong id="quote-operator">—</strong><span id="quote-title">—</span></div>
+              <button class="round-button" id="next-quote" type="button" aria-label="换一句台词">↻</button>
+            </div>
+            <a class="portrait-source" id="portrait-source" href="#" target="_blank" rel="noopener noreferrer" hidden>立绘来源 ↗</a>
+            <div class="quote-corner" aria-hidden="true">ARKOTO / 语音档案</div>
+          </article>
+
+          <aside class="control-card">
+            <div class="control-heading"><span>01 / 设定频道</span><span>CHANNEL CONFIG</span></div>
+            <label for="operator-input">指定干员</label>
+            <div class="input-shell"><span aria-hidden="true">⌕</span><input id="operator-input" list="operator-options" autocomplete="off" placeholder="输入干员名称，或留空随机" /><datalist id="operator-options"></datalist></div>
+            <label for="title-select">台词场景</label>
+            <div class="select-shell"><select id="title-select"><option value="">所有场景</option></select><span aria-hidden="true">⌄</span></div>
+            <div class="control-rule"></div>
+            <div class="mode-row"><span>推荐模式</span><div class="segmented" role="group" aria-label="推荐模式"><button id="mode-random" class="active" type="button">随机</button><button id="mode-today" type="button">今日</button></div></div>
+            <button class="button button-primary control-submit" id="fetch-quote" type="button">接收台词 <span aria-hidden="true">↗</span></button>
+            <p class="control-note">“今日”模式按北京时间固定，同一天的同一筛选条件会返回相同台词。</p>
+          </aside>
+        </div>
+      </section>
+
+      <section class="section section-api" id="api">
+        <div class="wrap">
+          <div class="section-heading">
+            <div><span class="section-number">02 — OPEN INTERFACE</span><h2>一句代码，接入泰拉</h2></div>
+            <p>简洁的 JSON 接口，为网站、应用与自动化工具准备。</p>
+          </div>
+          <div class="api-grid">
+            <div class="api-intro">
+              <div class="api-kicker"><span>GET</span> /api/v1/quotes/random</div>
+              <h3>让每一次访问，<br />都有新的回声。</h3>
+              <p>可以使用 <code>operator</code> 指定干员，或用 <code>title</code> 筛选台词场景。想每天展示固定内容，把路径改为 <code>/today</code>。</p>
+              <div class="api-badges"><span>JSON</span><span>无需密钥 · 本地预览</span><span>CORS</span></div>
+            </div>
+            <div class="code-card">
+              <div class="code-header"><span><i></i> API REQUEST</span><button id="copy-api" type="button">复制地址 ↗</button></div>
+              <pre><code><span class="code-muted">// 随机获取一条台词</span>
+<span class="code-method">GET</span> <span id="api-example">/api/v1/quotes/random</span>
+
+<span class="code-muted">// 示例响应</span>
+{
+  <span class="code-key">"content"</span>: <span class="code-string">"一段来自泰拉的声音……"</span>,
+  <span class="code-key">"operator"</span>: { <span class="code-key">"name"</span>: <span class="code-string">"干员名称"</span> },
+  <span class="code-key">"title"</span>: <span class="code-string">"任命助理"</span>,
+  <span class="code-key">"illustration"</span>: { <span class="code-key">"url"</span>: <span class="code-string">"立绘图片地址"</span> },
+  <span class="code-key">"edition"</span>: <span class="code-string">"CN"</span>
+}</code></pre>
+              <div class="code-footer"><span>也可访问 <code>/api/v1/operators</code> 和 <code>/api/v1/categories</code></span><a id="try-api" href="/api/v1/quotes/random" target="_blank" rel="noopener noreferrer">试一试 ↗</a></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section wrap cg-gallery" id="cg">
+        <div class="section-heading">
+          <div><span class="section-number">03 — STORY ARCHIVE</span><h2>故事留下的画面</h2></div>
+          <p>独立浏览剧情 CG。它们与干员语音没有一一对应关系。</p>
+        </div>
+        <div class="cg-panel">
+          <div class="cg-stage">
+            <img id="cg-image" alt="明日方舟剧情 CG" hidden />
+            <div class="cg-cover" id="cg-cover"><span>VISUAL ARCHIVE / SPOILER NOTICE</span><p>这张图片可能包含剧情剧透。</p><button class="button button-primary" id="reveal-cg" type="button">显示图片 <span aria-hidden="true">↗</span></button></div>
+          </div>
+          <div class="cg-info"><span class="section-number">IMAGE CHANNEL / 001</span><h3>让故事<br />拥有画面。</h3><p>随机浏览剧情插图。图片从来源仓库按需加载，Arkoto 仓库只保存文件索引。</p><div class="cg-actions"><button class="button button-secondary" id="next-cg" type="button">换一张 <span aria-hidden="true">↻</span></button><a id="cg-source" href="https://github.com/Aceship/Arknight-Images/tree/main/avg/images" target="_blank" rel="noopener noreferrer">查看素材来源 ↗</a></div><small id="cg-filename">正在读取图片索引…</small><code>GET /api/v1/cg/random</code></div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="wrap footer-grid"><div><strong>ARKOTO</strong><p>一条来自泰拉的讯息。</p></div><div>本站为非官方本地原型。<br />《明日方舟》相关内容归其权利人所有。<br /><span id="data-updated">数据同步时间：—</span></div><a href="#top">返回顶部 ↑</a></div>
+    </footer>
+  </body>
+</html>

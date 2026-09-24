@@ -1,0 +1,9 @@
+[
+  {
+    "id": "your-authorized-image-id",
+    "url": "https://example.com/authorized-image.webp",
+    "orientation": "horizontal",
+    "source": "Artist or rights holder, with source URL and permission record"
+  }
+]
+
