@@ -6,6 +6,8 @@
 
 《明日方舟》干员台词、对应立绘与剧情 CG 的非官方 API 原型。
 
+[在线体验](https://arkoto.arkoto.workers.dev/) · [状态接口](https://arkoto.arkoto.workers.dev/api/v1/status)
+
 [快速开始](#快速开始) · [接口一览](#接口一览) · [Cloudflare 部署](#cloudflare-部署) · [数据与使用说明](#数据与使用说明)
 
 </div>
@@ -75,7 +77,7 @@ curl 'http://127.0.0.1:8765/api/v1/quotes/random?operator=%E9%98%BF%E7%B1%B3%E5%
 
 ## Cloudflare 部署
 
-项目已准备 **Workers + 静态资源 + D1** 版本，无需另外租 VPS。Workers 托管网页和 API，D1 存台词；图片仍由来源镜像按需加载。完整步骤见 [Cloudflare 部署指南](docs/cloudflare.md)。
+项目已部署到 [arkoto.arkoto.workers.dev](https://arkoto.arkoto.workers.dev/)，使用 **Workers + 静态资源 + D1**，无需另外租 VPS。Workers 托管网页和 API，D1 存台词；图片仍由来源镜像按需加载。完整步骤见 [Cloudflare 部署指南](docs/cloudflare.md)。购买 `arkoto.me` 后可再绑定自定义域名。
 
 本地模拟 Cloudflare 环境：
 
@@ -86,7 +88,7 @@ npx wrangler d1 execute arkoto --local --file=data/generated/arkoto-d1.sql --yes
 npm run dev
 ```
 
-然后打开 **http://127.0.0.1:8787/**。首次运行前仍需按“快速开始”导入原始数据。`wrangler.jsonc` 中的 D1 ID 目前是本地开发占位值；远程部署前必须换成自己 Cloudflare 账户创建的数据库 ID。
+然后打开 **http://127.0.0.1:8787/**。首次运行前仍需按“快速开始”导入原始数据。`wrangler.jsonc` 已绑定项目的 Cloudflare D1；如果在自己的账户重新部署，请将其中的数据库 ID 换成新建 D1 的 ID。
 
 ## 数据与使用说明
 

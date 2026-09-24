@@ -2,6 +2,8 @@
 
 Arkoto 使用一个 Cloudflare Worker 同时提供静态网页与 API，D1 保存台词。**不需要 VPS**。下面的步骤会创建公开可访问的服务；部署前先确认《明日方舟》文字和图片的使用范围。
 
+项目现已部署在 [arkoto.arkoto.workers.dev](https://arkoto.arkoto.workers.dev/)；本指南也可用于重新部署或迁移到其他 Cloudflare 账户。
+
 ## 1. 准备本地数据
 
 在项目根目录运行：
@@ -21,7 +23,7 @@ npx wrangler login
 npx wrangler d1 create arkoto
 ```
 
-第二个命令会给出数据库 ID。把 `wrangler.jsonc` 中的 `00000000-0000-0000-0000-000000000000` 换成真实 ID；如 Wrangler 问是否自动添加 binding，已有 `DB` binding 时不要重复添加。先确认操作的是自己的 Cloudflare 账户。
+第二个命令会给出数据库 ID。仓库中的 `wrangler.jsonc` 已绑定项目数据库；如果在新的 Cloudflare 账户部署，请把其中的 `database_id` 换成新建 D1 的 ID。如 Wrangler 问是否自动添加 binding，已有 `DB` binding 时不要重复添加。先确认操作的是自己的 Cloudflare 账户。
 
 ## 3. 导入并部署
 
