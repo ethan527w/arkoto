@@ -5,4 +5,5 @@ __pycache__/
 data/raw/
 data/generated/
 data/wallpapers.json
-
+node_modules/
+.wrangler/
