@@ -4,7 +4,7 @@
 
 **让一句来自泰拉的台词，出现在你的网站、机器人或桌面。**
 
-《明日方舟》干员台词与对应立绘的非官方 API 原型。
+《明日方舟》干员台词、对应立绘与剧情 CG 的非官方 API 原型。
 
 [在线体验](https://arkoto.me/) · [API 文档](https://arkoto.me/docs) · [状态接口](https://arkoto.me/api/v1/status)
 
@@ -22,9 +22,10 @@
 | 随机台词 | 从国服干员语音文本中随机返回一条，可按干员和场景筛选 |
 | 今日台词 | 按北京时间固定，同一天、同一筛选条件返回同一条 |
 | 对应立绘 | 台词响应附带该干员的立绘 URL、文件名和来源 |
+| 剧情 CG | 独立的随机图片接口与网页图库 |
 | 接入友好 | JSON 响应、跨域 GET、无需密钥的本地预览 |
 
-当前数据快照：**18,237** 条台词 · **435** 个有台词的干员 ID。台词数据库约 **5 MB**；仓库只保存代码与轻量元数据索引，不打包游戏台词数据库或图片文件。
+当前数据快照：**18,237** 条台词 · **435** 个有台词的干员 ID · **829** 张剧情 CG 文件索引。台词数据库约 **5 MB**；仓库只保存代码与轻量元数据索引，不打包游戏台词数据库或图片文件。
 
 ## 快速开始
 
@@ -47,6 +48,7 @@ python3 server.py
 | `GET /api/v1/quotes/today` | 北京时间当日固定台词与立绘 |
 | `GET /api/v1/operators?q=阿米娅&limit=20` | 搜索干员；`limit` 最大 200 |
 | `GET /api/v1/categories` | 台词场景及数量 |
+| `GET /api/v1/cg/random` | 随机剧情 CG 的图片链接与来源 |
 | `GET /api/v1/status` | 数据量、来源和同步时间 |
 | `GET /api/v1/wallpapers/random` | 预留；无已授权壁纸库时返回 503 |
 
@@ -71,7 +73,7 @@ curl 'http://127.0.0.1:8765/api/v1/quotes/random?operator=%E9%98%BF%E7%B1%B3%E5%
 }
 ```
 
-实际响应还包含 `id`、`date` 和台词数据 `source`。没有匹配结果时返回 404；缺立绘时 `illustration` 为 `null`。完整接入说明见 [在线 API 文档](https://arkoto.me/docs)。
+实际响应还包含 `id`、`date` 和台词数据 `source`。没有匹配结果时返回 404；缺立绘时 `illustration` 为 `null`。剧情 CG 与干员语音没有可靠的一一对应关系，因此 CG 是独立图库。完整接入说明见 [在线 API 文档](https://arkoto.me/docs)。
 
 ## Cloudflare 部署
 
@@ -92,11 +94,12 @@ npm run dev
 
 - 台词和干员名：[ArknightsGamedata](https://github.com/ArknightsAssets/ArknightsGamedata) 的国服数据快照，导入自 `charword_table.json` 和 `character_table.json`。
 - 干员立绘文件名：[ArknightsAssets2](https://github.com/ArknightsAssets/ArknightsAssets2/tree/cn/assets/dyn/arts/charportraits)。当前 435 个有台词的干员 ID 均能找到立绘。
+- 剧情 CG 文件名：[Aceship/Arknight-Images](https://github.com/Aceship/Arknight-Images/tree/main/avg/images)。网页和 API 返回第三方镜像链接；镜像的可用性不由 Arkoto 控制。
 
 `data/raw/`、`data/generated/` 和本地 `data/wallpapers.json` 已被 Git 忽略。可用 `python3 -m scripts.update_image_index` 刷新图片文件名索引。壁纸配置格式见 [示例](data/wallpapers.example.json)。
 
 > [!IMPORTANT]
-> 仍需核实游戏文本与立绘的公开使用范围，尤其是对外提供 API 的场景；[日本运营方的二次创作指引](https://www.arknights.jp/fankit/guidelines)对直接复制素材设有限制。还需要决定数据同步、访问限流、监控与备份方案。购买域名和部署代码不会自动解决这些问题。
+> 仍需核实游戏文本与图片的公开使用范围，尤其是完整 CG 和对外提供 API 的场景；[日本运营方的二次创作指引](https://www.arknights.jp/fankit/guidelines)对直接复制素材设有限制。还需要决定数据同步、访问限流、监控与备份方案。购买域名和部署代码不会自动解决这些问题。
 
 ## 项目结构
 

@@ -5,6 +5,8 @@ import images from "../data/image_index.json";
 
 const PORTRAIT_SOURCE = "https://github.com/ArknightsAssets/ArknightsAssets2/tree/cn/assets/dyn/arts/charportraits";
 const PORTRAIT_BASE = "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/refs/heads/cn/assets/dyn/arts/charportraits/";
+const CG_SOURCE = "https://github.com/Aceship/Arknight-Images/tree/main/avg/images";
+const CG_BASE = "https://raw.githubusercontent.com/Aceship/Arknight-Images/refs/heads/main/avg/images/";
 
 function json(request, status, body, cacheControl = "no-store") {
   return new Response(request.method === "HEAD" ? null : JSON.stringify(body), {
@@ -105,7 +107,7 @@ async function handleApi(request, env, url) {
     await env.DB.prepare("SELECT 1 FROM quotes LIMIT 1").first();
     return json(request, 200, {
       status: "ok", lines: catalog.lines, operators: catalog.operators.length,
-      portraits: Object.keys(images.portraits).length,
+      portraits: Object.keys(images.portraits).length, story_cg: images.cg.length,
       wallpapers: 0, imported_at: catalog.imported_at, source: catalog.source,
     }, "public, max-age=60");
   }
@@ -136,6 +138,14 @@ async function handleApi(request, env, url) {
       title: row.title, edition: "CN", date: day || null,
       source: catalog.source, illustration: imageFor(row.operator_id),
     });
+  }
+  if (pathname === "/api/v1/cg/random") {
+    if (!images.cg.length) return json(request, 503, { error: "cg_catalog_unavailable" });
+    const filename = images.cg[crypto.getRandomValues(new Uint32Array(1))[0] % images.cg.length];
+    return json(request, 200, { data: {
+      type: "story_cg", url: CG_BASE + encodeURIComponent(filename),
+      source: CG_SOURCE, filename,
+    } });
   }
   if (pathname === "/api/v1/wallpapers/random") {
     const orientation = first(searchParams, "orientation");

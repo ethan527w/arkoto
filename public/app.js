@@ -55,6 +55,34 @@ async function fetchQuote() {
   }
 }
 
+async function fetchCg() {
+  const image = byId("cg-image");
+  const placeholder = byId("cg-placeholder");
+  image.onload = null;
+  image.onerror = null;
+  image.hidden = true;
+  image.removeAttribute("src");
+  placeholder.hidden = false;
+  placeholder.textContent = "正在加载故事画面…";
+  byId("cg-filename").textContent = "正在读取图片索引…";
+  byId("next-cg").disabled = true;
+  try {
+    const response = await fetch("/api/v1/cg/random");
+    const result = await response.json();
+    if (!response.ok) throw new Error("剧情图片暂不可用");
+    byId("cg-source").href = result.data.source;
+    byId("cg-filename").textContent = result.data.filename;
+    image.onload = () => { image.hidden = false; placeholder.hidden = true; };
+    image.onerror = () => { placeholder.textContent = "图片暂时无法加载，换一张试试。"; };
+    image.src = result.data.url;
+  } catch (error) {
+    placeholder.textContent = error.message;
+    byId("cg-filename").textContent = error.message;
+  } finally {
+    byId("next-cg").disabled = false;
+  }
+}
+
 async function loadOperators(query = "") {
   try {
     const response = await fetch(`/api/v1/operators?q=${encodeURIComponent(query)}&limit=30`);
@@ -93,6 +121,7 @@ async function loadPageData() {
   }
   await loadOperators();
   await fetchQuote();
+  fetchCg();
 }
 
 byId("mode-random").addEventListener("click", () => {
@@ -111,6 +140,7 @@ byId("mode-today").addEventListener("click", () => {
 });
 byId("fetch-quote").addEventListener("click", fetchQuote);
 byId("next-quote").addEventListener("click", fetchQuote);
+byId("next-cg").addEventListener("click", fetchCg);
 byId("title-select").addEventListener("change", updateEndpoint);
 byId("operator-input").addEventListener("input", (event) => {
   updateEndpoint();

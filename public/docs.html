@@ -37,6 +37,7 @@
           <a href="#filters">筛选参数</a>
           <a href="#response">响应字段</a>
           <a href="#lookup">查询干员与场景</a>
+          <a href="#cg">剧情 CG</a>
           <a href="#errors">错误与使用说明</a>
         </aside>
 
@@ -121,8 +122,24 @@ curl --get 'https://arkoto.me/api/v1/quotes/today' \
             <p>查看台词、干员与立绘数量，以及 <code>imported_at</code> 数据同步时间。</p>
           </section>
 
+          <section id="cg" class="docs-section">
+            <span class="docs-number">06 / STORY ARCHIVE</span>
+            <h2>故事留下的画面</h2>
+            <div class="endpoint"><span>GET</span><code>/api/v1/cg/random</code><a href="/api/v1/cg/random" target="_blank" rel="noopener noreferrer">打开 ↗</a></div>
+            <p>随机返回一张剧情 CG 的图片链接和来源。CG 是独立图库，与干员台词没有一一对应关系。</p>
+            <pre><code>{
+  "data": {
+    "type": "story_cg",
+    "url": "图片地址",
+    "source": "图片来源地址",
+    "filename": "图片文件名"
+  }
+}</code></pre>
+            <p>图片由第三方来源托管，接口只返回链接与文件名。网页中也可以在首页的“故事留下的画面”区块随机浏览。</p>
+          </section>
+
           <section id="errors" class="docs-section">
-            <span class="docs-number">06 / NOTES</span>
+            <span class="docs-number">07 / NOTES</span>
             <h2>错误与使用说明</h2>
             <div class="docs-table-wrap"><table><thead><tr><th>状态码</th><th>说明</th></tr></thead><tbody>
               <tr><td><code>200</code></td><td>请求成功</td></tr>

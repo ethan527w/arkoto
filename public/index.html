@@ -21,6 +21,7 @@
       <nav class="nav" aria-label="主导航">
         <a href="#explore">语录探索</a>
         <a href="/docs.html">接口文档</a>
+        <a href="#cg">剧情 CG</a>
       </nav>
       <a class="header-github" href="https://github.com/ethan527w/arkoto" target="_blank" rel="noopener noreferrer">GitHub <span aria-hidden="true">↗</span></a>
     </header>
@@ -118,6 +119,20 @@
               <div class="code-footer"><span>也可访问 <code>/api/v1/operators</code> 和 <code>/api/v1/categories</code></span><a id="try-api" href="/api/v1/quotes/random" target="_blank" rel="noopener noreferrer">试一试 ↗</a><a href="/docs.html">完整文档 ↗</a></div>
             </div>
           </div>
+        </div>
+      </section>
+
+      <section class="section wrap cg-gallery" id="cg">
+        <div class="section-heading">
+          <div><span class="section-number">03 — STORY ARCHIVE</span><h2>故事留下的画面</h2></div>
+          <p>独立浏览剧情 CG。它们与干员语音没有一一对应关系。</p>
+        </div>
+        <div class="cg-panel">
+          <div class="cg-stage">
+            <img id="cg-image" alt="明日方舟剧情 CG" hidden />
+            <div class="cg-placeholder" id="cg-placeholder">正在加载故事画面…</div>
+          </div>
+          <div class="cg-info"><span class="section-number">IMAGE CHANNEL / 001</span><h3>让故事<br />拥有画面。</h3><p>随机浏览剧情插图。图片从来源仓库按需加载，Arkoto 仓库只保存文件索引。</p><div class="cg-actions"><button class="button button-secondary" id="next-cg" type="button">换一张 <span aria-hidden="true">↻</span></button><a id="cg-source" href="https://github.com/Aceship/Arknight-Images/tree/main/avg/images" target="_blank" rel="noopener noreferrer">查看素材来源 ↗</a></div><small id="cg-filename">正在读取图片索引…</small><code>GET /api/v1/cg/random</code></div>
         </div>
       </section>
 
