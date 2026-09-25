@@ -6,7 +6,7 @@
 
 《明日方舟》干员语音文本、对应立绘与剧情 CG 索引的非官方 API 项目。
 
-[在线体验](https://arkoto.me/) · [网页接口文档](https://arkoto.me/docs.html) · [服务状态](https://arkoto.me/api/v1/status)
+[在线体验](https://arkoto.me/) · [网页接口文档](https://arkoto.me/docs) · [服务状态](https://arkoto.me/api/v1/status)
 
 [开始调用](#开始调用) · [接口总览](#接口总览) · [台词接口](#台词接口) · [本地运行](#本地运行)
 
