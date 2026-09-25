@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title desc">
+  <title id="title">Arkoto 标志</title>
+  <desc id="desc">一枚带斜角尾部的方形通讯框，框内是两枚几何引号。</desc>
+  <path fill="#e7c977" fill-rule="evenodd" d="M9 10h46v29L42 53H9V10Zm5 5v33h26l10-11V15H14Z"/>
+  <path fill="#e7c977" d="M21 23h11v9l-6 10h-7l6-10h-4v-9Zm15 0h11v9l-6 10h-7l6-10h-4v-9Z"/>
+</svg>

@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title desc">
+  <title id="title">Arkoto 标志（浅色背景）</title>
+  <desc id="desc">适用于浅色背景的 Arkoto 几何引号标志。</desc>
+  <path fill="#80602a" fill-rule="evenodd" d="M9 10h46v29L42 53H9V10Zm5 5v33h26l10-11V15H14Z"/>
+  <path fill="#80602a" d="M21 23h11v9l-6 10h-7l6-10h-4v-9Zm15 0h11v9l-6 10h-7l6-10h-4v-9Z"/>
+</svg>

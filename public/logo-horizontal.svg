@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 440 90" role="img" aria-labelledby="title desc">
+  <title id="title">Arkoto — Terra in Words</title>
+  <desc id="desc">Arkoto 的几何引号标志、定制字标和 Terra in Words 标语。</desc>
+  <g fill="#e7c977">
+    <path fill-rule="evenodd" d="M8 13h64v40L54 72H8V13Zm7 7v45h36l14-15V20H15Z"/>
+    <path d="M25 31h15v12L32 57h-9l8-14h-6V31Zm21 0h15v12L53 57h-9l8-14h-6V31Z"/>
+  </g>
+  <g transform="translate(103 22) scale(3.03)" fill="none" stroke="#f3f1e9" stroke-width="2.25" stroke-linecap="square" stroke-linejoin="miter">
+    <path d="M1 13 7 1l6 12M3.5 8.5h7"/>
+    <path d="M19 13V1h8l3 2v4l-3 2h-8m6 0 5 4"/>
+    <path d="M37 1v12m12-12L37 8m5.5-2.5L49 13"/>
+    <path d="M58 1h8l3 3v6l-3 3h-8l-3-3V4z"/>
+    <path d="M74 1h13m-6.5 0v12"/>
+    <path d="M96 1h8l3 3v6l-3 3h-8l-3-3V4z"/>
+  </g>
+  <text x="105" y="82" fill="#e7c977" font-family="Arial, Helvetica, sans-serif" font-size="11" font-weight="700" letter-spacing="4.4">TERRA IN WORDS</text>
+</svg>

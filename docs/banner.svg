@@ -1,34 +1,34 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 320" role="img" aria-labelledby="title description">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 340" role="img" aria-labelledby="title description">
   <title id="title">Arkoto — Terra in Words</title>
-  <desc id="description">A dark geometric banner for the Arkoto Arknights quote API.</desc>
+  <desc id="description">Arkoto 的深色 README 横幅，使用几何引号标志和暖金色信号圆环。</desc>
   <defs>
-    <linearGradient id="background" x2="1" y2="1">
-      <stop stop-color="#10191c"/>
-      <stop offset="1" stop-color="#25332d"/>
-    </linearGradient>
-    <radialGradient id="glow">
-      <stop stop-color="#9dba94" stop-opacity=".28"/>
-      <stop offset="1" stop-color="#9dba94" stop-opacity="0"/>
-    </radialGradient>
     <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
-      <path d="M40 0H0V40" fill="none" stroke="#9bb8a5" stroke-opacity=".08"/>
+      <path d="M40 0H0V40" fill="none" stroke="#f3f1e9" stroke-opacity=".055"/>
     </pattern>
+    <radialGradient id="halo">
+      <stop stop-color="#e7c977" stop-opacity=".13"/>
+      <stop offset="1" stop-color="#e7c977" stop-opacity="0"/>
+    </radialGradient>
   </defs>
-  <rect width="1200" height="320" fill="url(#background)"/>
-  <rect width="1200" height="320" fill="url(#grid)"/>
-  <ellipse cx="940" cy="160" rx="290" ry="245" fill="url(#glow)"/>
-  <path d="M0 268H1200M0 52H1200" stroke="#d3c795" stroke-opacity=".18"/>
-  <path d="M47 52V268M1153 52V268" stroke="#d3c795" stroke-opacity=".18"/>
-  <g fill="none" stroke="#d8c98c">
-    <circle cx="944" cy="160" r="111" stroke-opacity=".45"/>
-    <circle cx="944" cy="160" r="85" stroke-opacity=".22"/>
-    <path d="M944 28L1076 160 944 292 812 160Z" stroke-opacity=".2"/>
-    <path d="M900 191L932 113 946 146 969 103 993 191M915 160H980" stroke-width="3" stroke-linecap="square" stroke-linejoin="miter"/>
-    <path d="M944 40v19m0 202v19M824 160h19m202 0h19" stroke-opacity=".55"/>
+  <rect width="1200" height="340" fill="#0c1114"/>
+  <rect width="1200" height="340" fill="url(#grid)"/>
+  <circle cx="964" cy="169" r="245" fill="url(#halo)"/>
+  <path d="M0 52H1200M0 288H1200M48 52V288M1152 52V288" fill="none" stroke="#e7c977" stroke-opacity=".22"/>
+  <path d="M76 104v-27h27M1124 104V77h-27" fill="none" stroke="#e7c977" stroke-width="2" stroke-opacity=".55"/>
+  <text x="78" y="99" fill="#e7c977" font-family="Arial, Helvetica, sans-serif" font-size="13" font-weight="700" letter-spacing="5">ARKOTO / 001</text>
+  <text x="72" y="183" fill="#f3f1e9" font-family="Arial, Helvetica, sans-serif" font-size="78" font-weight="800" letter-spacing="8">ARKOTO</text>
+  <text x="78" y="226" fill="#e7c977" font-family="Arial, Helvetica, sans-serif" font-size="19" font-weight="700" letter-spacing="6">TERRA IN WORDS</text>
+  <text x="78" y="269" fill="#f3f1e9" fill-opacity=".72" font-family="Arial, Helvetica, sans-serif" font-size="11" font-weight="700" letter-spacing="2.6">QUOTE API  /  CN VOICE ARCHIVE  /  STORY CG</text>
+  <text x="1018" y="82" fill="#e7c977" font-family="Arial, Helvetica, sans-serif" font-size="11" font-weight="700" letter-spacing="2">GET /api/v1</text>
+  <g fill="none" stroke="#e7c977">
+    <circle cx="964" cy="169" r="116" stroke-opacity=".48"/>
+    <circle cx="964" cy="169" r="94" stroke-opacity=".24"/>
+    <path d="M964 27 1106 169 964 311 822 169Z" stroke-opacity=".17"/>
+    <path d="M964 39v18m0 224v18M834 169h18m224 0h18" stroke-opacity=".7"/>
   </g>
-  <circle cx="1047" cy="105" r="4" fill="#eacb77"/>
-  <text x="76" y="96" fill="#e3ce8d" font-family="Arial, sans-serif" font-size="14" font-weight="700" letter-spacing="6">ARKOTO / 001</text>
-  <text x="72" y="174" fill="#f5f2e7" font-family="Arial, sans-serif" font-size="68" font-weight="800" letter-spacing="8">ARKOTO</text>
-  <text x="77" y="214" fill="#b8c8bd" font-family="Arial, sans-serif" font-size="18" letter-spacing="6">TERRA IN WORDS</text>
-  <text x="77" y="252" fill="#d4c38e" font-family="Arial, sans-serif" font-size="11" letter-spacing="3">WORDS · OPERATORS · STORY VISUALS</text>
+  <g transform="translate(898 103) scale(2.0625)" fill="#e7c977">
+    <path fill-rule="evenodd" d="M9 10h46v29L42 53H9V10Zm5 5v33h26l10-11V15H14Z"/>
+    <path d="M21 23h11v9l-6 10h-7l6-10h-4v-9Zm15 0h11v9l-6 10h-7l6-10h-4v-9Z"/>
+  </g>
+  <circle cx="1070" cy="90" r="4" fill="#e7c977"/>
 </svg>
