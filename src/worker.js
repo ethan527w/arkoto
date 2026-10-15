@@ -2,6 +2,8 @@
 
 import catalog from "../data/catalog_index.json";
 import images from "../data/image_index.json";
+import birthdays from "../data/birthday_index.json";
+import { shanghaiDate, validBirthdayDate } from "./dates.js";
 
 const PORTRAIT_SOURCE = "https://github.com/ArknightsAssets/ArknightsAssets2/tree/cn/assets/dyn/arts/charportraits";
 const PORTRAIT_BASE = "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/refs/heads/cn/assets/dyn/arts/charportraits/";
@@ -24,14 +26,6 @@ function json(request, status, body, cacheControl = "no-store") {
 
 function first(params, name) {
   return (params.get(name) || "").trim().slice(0, 100);
-}
-
-function shanghaiDate() {
-  const parts = new Intl.DateTimeFormat("en-US", {
-    timeZone: "Asia/Shanghai", year: "numeric", month: "2-digit", day: "2-digit",
-  }).formatToParts(new Date());
-  const part = (name) => parts.find((item) => item.type === name).value;
-  return `${part("year")}-${part("month")}-${part("day")}`;
 }
 
 async function choosePosition(count, dailySeed) {
@@ -108,6 +102,8 @@ async function handleApi(request, env, url) {
     return json(request, 200, {
       status: "ok", lines: catalog.lines, operators: catalog.operators.length,
       portraits: Object.keys(images.portraits).length, story_cg: images.cg.length,
+      birthdays: birthdays.operators.filter((item) => item.birthday.month !== null).length,
+      birthdays_imported_at: birthdays.imported_at,
       wallpapers: 0, imported_at: catalog.imported_at, source: catalog.source,
     }, "public, max-age=60");
   }
@@ -121,6 +117,31 @@ async function handleApi(request, env, url) {
   }
   if (pathname === "/api/v1/categories") {
     return json(request, 200, { data: catalog.categories }, "public, max-age=3600");
+  }
+  if (pathname === "/api/v1/birthdays" || pathname === "/api/v1/birthdays/today") {
+    const today = pathname.endsWith("/today");
+    const day = today ? shanghaiDate() : "";
+    const requestedDate = first(searchParams, "date");
+    if (today && requestedDate) return json(request, 400, { error: "date_not_allowed", message: "指定日期请使用 /api/v1/birthdays?date=MM-DD" });
+    if (requestedDate && !validBirthdayDate(requestedDate)) {
+      return json(request, 400, { error: "invalid_date", message: "date 必须为有效的 MM-DD 日期，例如 12-23" });
+    }
+    const filterDate = today ? day.slice(5) : requestedDate;
+    const operator = first(searchParams, "operator");
+    const data = birthdays.operators.filter((item) => {
+      const matchesOperator = !operator || item.id === operator || item.name === operator;
+      const birthday = item.birthday;
+      const matchesDate = !filterDate || (birthday.month !== null &&
+        `${String(birthday.month).padStart(2, "0")}-${String(birthday.day).padStart(2, "0")}` === filterDate);
+      return matchesOperator && matchesDate;
+    }).map((item) => ({
+      operator: { id: item.id, name: item.name }, birthday: item.birthday,
+      illustration: imageFor(item.id), source: birthdays.source,
+    }));
+    return json(request, 200, {
+      date: today ? day : (requestedDate || null), timezone: "Asia/Shanghai",
+      data, imported_at: birthdays.imported_at,
+    }, today ? "no-store" : "public, max-age=3600");
   }
   if (pathname === "/api/v1/quotes/random" || pathname === "/api/v1/quotes/today") {
     const operator = first(searchParams, "operator");

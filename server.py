@@ -14,6 +14,7 @@ from zoneinfo import ZoneInfo
 
 from arkoto.catalog import Catalog
 from arkoto.images import ImageCatalog
+from arkoto.birthdays import BirthdayCatalog, validate_birthday_date
 
 
 ROOT = Path(__file__).resolve().parent
@@ -21,6 +22,7 @@ PUBLIC = (ROOT / "public").resolve()
 DATABASE = ROOT / "data" / "generated" / "arkoto.sqlite3"
 WALLPAPERS = ROOT / "data" / "wallpapers.json"
 IMAGE_INDEX = ROOT / "data" / "image_index.json"
+BIRTHDAY_INDEX = ROOT / "data" / "birthday_index.json"
 SHANGHAI = ZoneInfo("Asia/Shanghai")
 
 
@@ -33,7 +35,8 @@ def load_wallpapers() -> list[dict]:
     return [item for item in value if isinstance(item, dict) and item.get("url") and item.get("source")]
 
 
-def create_handler(catalog: Catalog, wallpapers: list[dict], images: ImageCatalog):
+def create_handler(catalog: Catalog, wallpapers: list[dict], images: ImageCatalog, birthdays: BirthdayCatalog | None = None):
+    birthdays = birthdays or BirthdayCatalog(BIRTHDAY_INDEX)
     class Handler(BaseHTTPRequestHandler):
         server_version = "Arkoto/0.1"
 
@@ -45,7 +48,7 @@ def create_handler(catalog: Catalog, wallpapers: list[dict], images: ImageCatalo
             self.send_header("Content-Length", str(length))
             self.send_header("Cache-Control", cache_control)
             self.send_header("Access-Control-Allow-Origin", "*")
-            self.send_header("Access-Control-Allow-Methods", "GET, OPTIONS")
+            self.send_header("Access-Control-Allow-Methods", "GET, HEAD, OPTIONS")
             self.send_header("X-Content-Type-Options", "nosniff")
             self.send_header("Referrer-Policy", "strict-origin-when-cross-origin")
 
@@ -60,7 +63,7 @@ def create_handler(catalog: Catalog, wallpapers: list[dict], images: ImageCatalo
         def do_OPTIONS(self) -> None:
             self.send_response(204)
             self.send_header("Access-Control-Allow-Origin", "*")
-            self.send_header("Access-Control-Allow-Methods", "GET, OPTIONS")
+            self.send_header("Access-Control-Allow-Methods", "GET, HEAD, OPTIONS")
             self.send_header("Access-Control-Allow-Headers", "Content-Type")
             self.end_headers()
 
@@ -88,6 +91,8 @@ def create_handler(catalog: Catalog, wallpapers: list[dict], images: ImageCatalo
                     "wallpapers": len(wallpapers),
                     "portraits": len(images.portraits),
                     "story_cg": len(images.cg_files),
+                    "birthdays": sum(item["birthday"]["month"] is not None for item in birthdays.operators),
+                    "birthdays_imported_at": birthdays.imported_at,
                     "imported_at": catalog.meta.get("imported_at"),
                     "source": catalog.meta.get("source"),
                 }, "public, max-age=60")
@@ -103,6 +108,29 @@ def create_handler(catalog: Catalog, wallpapers: list[dict], images: ImageCatalo
             if path == "/api/v1/categories":
                 items = [{"title": title, "line_count": count} for title, count in catalog.titles.most_common()]
                 self.send_json(200, {"data": items}, "public, max-age=3600")
+                return
+            if path in ("/api/v1/birthdays", "/api/v1/birthdays/today"):
+                today = path.endswith("/today")
+                requested_date = first("date")
+                if today and requested_date:
+                    self.send_json(400, {"error": "date_not_allowed", "message": "指定日期请使用 /api/v1/birthdays?date=MM-DD"})
+                    return
+                try:
+                    if requested_date:
+                        validate_birthday_date(requested_date)
+                except ValueError:
+                    self.send_json(400, {"error": "invalid_date", "message": "date 必须为有效的 MM-DD 日期，例如 12-23"})
+                    return
+                day = datetime.now(SHANGHAI).date().isoformat() if today else ""
+                items = birthdays.select(first("operator"), day[5:] if today else requested_date)
+                self.send_json(200, {
+                    "date": day if today else (requested_date or None),
+                    "timezone": "Asia/Shanghai",
+                    "data": [{"operator": {"id": item["id"], "name": item["name"]},
+                              "birthday": item["birthday"], "illustration": images.portrait(item["id"]),
+                              "source": birthdays.source} for item in items],
+                    "imported_at": birthdays.imported_at,
+                }, "no-store" if today else "public, max-age=3600")
                 return
             if path in ("/api/v1/quotes/random", "/api/v1/quotes/today"):
                 operator, title = first("operator"), first("title")
@@ -145,6 +173,8 @@ def create_handler(catalog: Catalog, wallpapers: list[dict], images: ImageCatalo
 
         def handle_static(self, path: str) -> None:
             relative = unquote(path).lstrip("/") or "index.html"
+            if relative == "docs":
+                relative = "docs.html"
             file_path = (PUBLIC / relative).resolve()
             if not file_path.is_relative_to(PUBLIC) or not file_path.is_file():
                 self.send_json(404, {"error": "not_found"})

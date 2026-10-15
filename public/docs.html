@@ -9,6 +9,7 @@
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="stylesheet" href="/styles.css" />
     <link rel="stylesheet" href="/docs.css" />
+    <script src="/api-builder.js" defer></script>
     <title>API 文档 — Arkoto</title>
   </head>
   <body>
@@ -16,7 +17,7 @@
       <a class="brand" href="/" aria-label="Arkoto 首页">
         <img class="brand-logo" src="/logo-horizontal.svg" alt="" width="215" height="45" />
       </a>
-      <nav class="nav" aria-label="主导航"><a href="/">返回首页</a><a href="/#explore">语录探索</a></nav>
+      <nav class="nav" aria-label="主导航"><a href="/#explore">语录探索</a><a href="/#birthdays">干员生日</a><a href="/#cg">剧情 CG</a><a href="/docs#builder" aria-current="page">接口文档</a></nav>
       <a class="header-github" href="https://github.com/ethan527w/arkoto" target="_blank" rel="noopener noreferrer">GitHub <span aria-hidden="true">↗</span></a>
     </header>
 
@@ -24,23 +25,67 @@
       <div class="docs-hero">
         <span class="section-number">ARKOTO / API REFERENCE</span>
         <h1>接口文档<span> / v1</span></h1>
-        <p>把来自泰拉的台词放进你的网站、机器人或桌面。所有接口均为公开读取接口，返回 JSON，无需 API 密钥。</p>
+        <p>把来自泰拉的台词、干员生日与画面放进你的网站、机器人或桌面。所有接口均为公开读取接口，返回 JSON，无需 API 密钥。</p>
         <div class="docs-base"><span>BASE URL</span><code>https://arkoto.me/api/v1</code></div>
       </div>
 
       <div class="docs-grid">
         <aside class="docs-toc" aria-label="文档目录">
           <strong>目录 / CONTENTS</strong>
+          <a href="#builder">00 接口生成器</a>
           <a href="#quickstart">快速接入</a>
           <a href="#quotes">获取台词</a>
           <a href="#filters">筛选参数</a>
           <a href="#response">响应字段</a>
           <a href="#lookup">查询干员与场景</a>
+          <a href="#birthdays">干员生日与立绘</a>
           <a href="#cg">剧情 CG</a>
           <a href="#errors">错误与使用说明</a>
         </aside>
 
         <div class="docs-content">
+          <section id="builder" class="docs-section">
+            <span class="docs-number">00 / API BUILDER</span>
+            <h2>接口生成器</h2>
+            <p>选择功能与筛选条件，即可复制 API 地址或调用代码。中文参数会自动编码；点“打开接口”可直接查看实际返回。</p>
+            <noscript><p>接口生成器需要 JavaScript。也可以继续阅读下方的接口说明，直接复制示例。</p></noscript>
+            <form id="api-builder" class="api-builder">
+              <fieldset class="builder-fieldset"><legend>想获取什么？</legend><div class="builder-choices">
+                <label><input type="radio" name="resource" value="quotes" checked />干员台词</label>
+                <label><input type="radio" name="resource" value="birthdays" />生日与立绘</label>
+                <label><input type="radio" name="resource" value="cg" />剧情 CG</label>
+                <label><input type="radio" name="resource" value="operators" />干员列表</label>
+                <label><input type="radio" name="resource" value="categories" />台词场景</label>
+                <label><input type="radio" name="resource" value="status" />服务状态</label>
+              </div></fieldset>
+              <fieldset id="builder-quote-mode" class="builder-fieldset"><legend>选择模式</legend><div class="builder-choices">
+                <label><input type="radio" name="quote-mode" value="random" checked />随机一句</label>
+                <label><input type="radio" name="quote-mode" value="today" />今日台词</label>
+              </div></fieldset>
+              <fieldset id="builder-birthday-mode" class="builder-fieldset" hidden><legend>查询方式</legend><div class="builder-choices">
+                <label><input type="radio" name="birthday-mode" value="today" checked />今日生日</label>
+                <label><input type="radio" name="birthday-mode" value="date" />指定日期</label>
+                <label><input type="radio" name="birthday-mode" value="operator" />全部 / 查干员</label>
+              </div></fieldset>
+              <div class="builder-fields">
+                <label id="builder-operator-field">干员名称或 ID（可选）<input id="builder-operator" list="builder-operators" maxlength="100" placeholder="留空表示不限干员" autocomplete="off" /></label>
+                <datalist id="builder-operators"></datalist>
+                <label id="builder-title-field">台词场景（可选）<select id="builder-title"><option value="">全部场景</option></select></label>
+                <label id="builder-date-field" hidden>生日日期（只按月日筛选）<input id="builder-date" type="date" /></label>
+                <label id="builder-query-field" hidden>干员名称片段（可选）<input id="builder-query" maxlength="100" placeholder="例如：阿米" /></label>
+                <label id="builder-limit-field" hidden>最多返回多少条<input id="builder-limit" type="number" min="1" max="200" step="1" value="50" /></label>
+              </div>
+              <p id="builder-hint" class="builder-hint" aria-live="polite"></p>
+              <fieldset class="builder-fieldset"><legend>复制格式</legend><div class="builder-choices builder-formats">
+                <label><input type="radio" name="format" value="url" checked />API 地址</label>
+                <label><input type="radio" name="format" value="curl" />cURL</label>
+                <label><input type="radio" name="format" value="javascript" />JavaScript</label>
+              </div></fieldset>
+              <pre class="builder-output"><code id="builder-output" aria-label="生成的 API 或代码">https://arkoto.me/api/v1/quotes/random</code></pre>
+              <div class="builder-actions"><button id="builder-copy" class="button button-primary" type="button">复制 API 地址</button><a id="builder-open" class="button button-secondary" href="/api/v1/quotes/random" target="_blank" rel="noopener noreferrer">打开接口 ↗</a><span id="builder-status" role="status"></span></div>
+            </form>
+          </section>
+
           <section id="quickstart" class="docs-section">
             <span class="docs-number">01 / START</span>
             <h2>快速接入</h2>
@@ -121,8 +166,34 @@ curl --get 'https://arkoto.me/api/v1/quotes/today' \
             <p>查看台词、干员与立绘数量，以及 <code>imported_at</code> 数据同步时间。</p>
           </section>
 
+          <section id="birthdays" class="docs-section">
+            <span class="docs-number">06 / BIRTHDAYS</span>
+            <h2>干员生日与立绘</h2>
+            <div class="endpoint"><span>GET</span><code>/api/v1/birthdays/today</code><a href="/api/v1/birthdays/today" target="_blank" rel="noopener noreferrer">打开 ↗</a></div>
+            <p>按北京时间返回当天过生日的干员，以及已有的对应立绘信息。当天无人生日时，成功返回 <code>200</code> 和空的 <code>data</code> 数组。此接口不接受 <code>date</code> 参数。</p>
+            <div class="endpoint"><span>GET</span><code>/api/v1/birthdays</code><a href="/api/v1/birthdays" target="_blank" rel="noopener noreferrer">打开 ↗</a></div>
+            <p>查询生日档案。可传 <code>operator</code> 精确匹配干员名称或 ID，或用 <code>date=MM-DD</code> 按月日筛选。两者可以组合；不传参数则返回全部已收录的生日档案。日期必须有效且补足两位，例如 <code>02-29</code>、<code>12-23</code>。</p>
+            <pre><code># 查询某位干员的生日与立绘
+curl --get 'https://arkoto.me/api/v1/birthdays' \
+  --data-urlencode 'operator=阿米娅'
+
+# 获取 12 月 23 日过生日的干员
+curl 'https://arkoto.me/api/v1/birthdays?date=12-23'
+
+# 获取今天过生日的干员
+curl 'https://arkoto.me/api/v1/birthdays/today'</code></pre>
+            <p>响应中 <code>date</code> 为今日查询的北京时间 <code>YYYY-MM-DD</code>、指定查询的 <code>MM-DD</code>，或未筛选日期时的 <code>null</code>。<code>timezone</code> 为 <code>Asia/Shanghai</code>；<code>data</code> 每项包含：</p>
+            <div class="docs-table-wrap"><table><thead><tr><th>字段</th><th>说明</th></tr></thead><tbody>
+              <tr><td><code>operator</code></td><td>干员 <code>id</code> 与 <code>name</code></td></tr>
+              <tr><td><code>birthday</code></td><td><code>month</code>、<code>day</code> 与基础档案中的 <code>text</code>。未公开或日期不确定时，月、日均为 <code>null</code>，保留原文</td></tr>
+              <tr><td><code>illustration</code></td><td>与台词接口相同的立绘对象，含 <code>url</code>、<code>source</code> 与 <code>filename</code>；未收录对应立绘时为 <code>null</code></td></tr>
+              <tr><td><code>source</code></td><td>本次生日索引对应的游戏档案来源</td></tr>
+            </tbody></table></div>
+            <p>不确定的生日不会出现在日期筛选与今日生日中。没有匹配干员时返回空数组。不同干员 ID 的异格档案分别展示；不自动合并。<code>imported_at</code> 是生日数据的同步时间，与台词数据同步时间独立。</p>
+          </section>
+
           <section id="cg" class="docs-section">
-            <span class="docs-number">06 / STORY ARCHIVE</span>
+            <span class="docs-number">07 / STORY ARCHIVE</span>
             <h2>故事留下的画面</h2>
             <div class="endpoint"><span>GET</span><code>/api/v1/cg/random</code><a href="/api/v1/cg/random" target="_blank" rel="noopener noreferrer">打开 ↗</a></div>
             <p>随机返回一张剧情 CG 的图片链接和来源。CG 是独立图库，与干员台词没有一一对应关系。</p>
@@ -138,11 +209,11 @@ curl --get 'https://arkoto.me/api/v1/quotes/today' \
           </section>
 
           <section id="errors" class="docs-section">
-            <span class="docs-number">07 / NOTES</span>
+            <span class="docs-number">08 / NOTES</span>
             <h2>错误与使用说明</h2>
             <div class="docs-table-wrap"><table><thead><tr><th>状态码</th><th>说明</th></tr></thead><tbody>
               <tr><td><code>200</code></td><td>请求成功</td></tr>
-              <tr><td><code>400</code></td><td>参数格式无效，例如非整数的 <code>limit</code></td></tr>
+              <tr><td><code>400</code></td><td>参数格式无效，例如非整数的 <code>limit</code>、无效的生日日期 <code>invalid_date</code>，或向今日生日传入 <code>date</code>（<code>date_not_allowed</code>）</td></tr>
               <tr><td><code>404</code></td><td>找不到符合筛选条件的台词或接口</td></tr>
               <tr><td><code>405</code></td><td>请求方法不支持</td></tr>
               <tr><td><code>503</code></td><td>服务或数据暂不可用</td></tr>

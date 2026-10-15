@@ -10,6 +10,7 @@
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="stylesheet" href="/styles.css" />
     <script src="/app.js" defer></script>
+    <script src="/birthdays.js" defer></script>
   </head>
   <body>
     <div class="page-glow" aria-hidden="true"></div>
@@ -19,8 +20,9 @@
       </a>
       <nav class="nav" aria-label="主导航">
         <a href="#explore">语录探索</a>
-        <a href="/docs.html">接口文档</a>
+        <a href="#birthdays">干员生日</a>
         <a href="#cg">剧情 CG</a>
+        <a href="/docs#builder">接口文档</a>
       </nav>
       <a class="header-github" href="https://github.com/ethan527w/arkoto" target="_blank" rel="noopener noreferrer">GitHub <span aria-hidden="true">↗</span></a>
     </header>
@@ -44,7 +46,7 @@
           <div class="orbit-label orbit-label-bottom">SIGNAL 001.09</div>
           <div class="crosshair crosshair-one">+</div><div class="crosshair crosshair-two">+</div>
         </div>
-        <div class="hero-index" aria-hidden="true">01 / 03</div>
+        <div class="hero-index" aria-hidden="true">01 / 04</div>
       </section>
 
       <section class="signal-strip" aria-label="数据概览">
@@ -88,10 +90,36 @@
         </div>
       </section>
 
+      <section class="section wrap birthday-section" id="birthdays">
+        <div class="section-heading">
+          <div><span class="section-number">02 — BIRTHDAY ARCHIVE</span><h2>今天，为谁送上祝福</h2></div>
+          <p>查询干员档案中的生日，看看当天过生日的干员与立绘。</p>
+        </div>
+        <div class="birthday-panel">
+          <div class="birthday-toolbar">
+            <div class="segmented" role="group" aria-label="生日查询方式">
+              <button id="birthday-mode-today" class="active" type="button" aria-pressed="true">今日生日</button>
+              <button id="birthday-mode-date" type="button" aria-pressed="false">按日期</button>
+              <button id="birthday-mode-operator" type="button" aria-pressed="false">按干员</button>
+            </div>
+            <form id="birthday-form" class="birthday-form">
+              <label id="birthday-date-field" hidden>选择日期（按月日查询）<input id="birthday-date" type="date" /></label>
+              <label id="birthday-operator-field" hidden>干员名称或 ID<input id="birthday-operator" list="birthday-operators" placeholder="例如：阿米娅" autocomplete="off" /></label>
+              <datalist id="birthday-operators"></datalist>
+              <button id="birthday-submit" class="button button-primary" type="submit" hidden>查询生日</button>
+            </form>
+            <span id="birthday-context" class="birthday-context">按北京时间查询</span>
+          </div>
+          <p id="birthday-message" class="birthday-message" role="status">正在读取生日档案……</p>
+          <div id="birthday-results" class="birthday-results" aria-label="生日查询结果"></div>
+          <div class="birthday-footer"><span>生日来自国服基础档案；未公开的日期保留原文。立绘由第三方来源托管。</span><a href="/docs#birthdays">生日 API 说明 ↗</a></div>
+        </div>
+      </section>
+
       <section class="section section-api" id="api">
         <div class="wrap">
           <div class="section-heading">
-            <div><span class="section-number">02 — OPEN INTERFACE</span><h2>一句代码，接入泰拉</h2></div>
+            <div><span class="section-number">03 — OPEN INTERFACE</span><h2>一句代码，接入泰拉</h2></div>
             <p>简洁的 JSON 接口，为网站、应用与自动化工具准备。</p>
           </div>
           <div class="api-grid">
@@ -114,7 +142,7 @@
   <span class="code-key">"illustration"</span>: { <span class="code-key">"url"</span>: <span class="code-string">"立绘图片地址"</span> },
   <span class="code-key">"edition"</span>: <span class="code-string">"CN"</span>
 }</code></pre>
-              <div class="code-footer"><span>也可访问 <code>/api/v1/operators</code> 和 <code>/api/v1/categories</code></span><a id="try-api" href="/api/v1/quotes/random" target="_blank" rel="noopener noreferrer">试一试 ↗</a><a href="/docs.html">完整文档 ↗</a></div>
+              <div class="code-footer"><span>在接口生成器中点选功能和筛选条件。</span><a id="try-api" href="/api/v1/quotes/random" target="_blank" rel="noopener noreferrer">试一试 ↗</a><a href="/docs#builder">生成 API 地址 ↗</a></div>
             </div>
           </div>
         </div>
@@ -122,7 +150,7 @@
 
       <section class="section wrap cg-gallery" id="cg">
         <div class="section-heading">
-          <div><span class="section-number">03 — STORY ARCHIVE</span><h2>故事留下的画面</h2></div>
+          <div><span class="section-number">04 — STORY ARCHIVE</span><h2>故事留下的画面</h2></div>
           <p>独立浏览剧情 CG。它们与干员语音没有一一对应关系。</p>
         </div>
         <div class="cg-panel">

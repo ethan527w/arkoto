@@ -4,7 +4,7 @@
 
 **让一句来自泰拉的台词，出现在你的网站、机器人或桌面。**
 
-《明日方舟》干员语音文本、对应立绘与剧情 CG 索引的非官方 API 项目。
+《明日方舟》干员语音文本、生日档案、对应立绘与剧情 CG 索引的非官方 API 项目。
 
 [在线体验](https://arkoto.me/) · [网页接口文档](https://arkoto.me/docs) · [服务状态](https://arkoto.me/api/v1/status)
 
@@ -17,7 +17,7 @@
 
 ## 项目概览
 
-Arkoto 提供公开读取的 JSON 接口：随机台词、按北京时间固定的「今日台词」、干员和场景查询、随机剧情 CG 链接。台词响应附带对应干员的立绘信息；剧情 CG 与台词没有可靠的一一对应关系，因此使用独立接口。
+Arkoto 提供公开读取的 JSON 接口：随机台词、按北京时间固定的「今日台词」、干员生日与当天生日立绘、干员和场景查询、随机剧情 CG 链接。台词与生日响应附带对应干员的立绘信息；剧情 CG 与台词没有可靠的一一对应关系，因此使用独立接口。网页 [接口生成器](https://arkoto.me/docs#builder) 可以点选条件，复制 URL、cURL 或 JavaScript。
 
 | 仓库索引快照（2026-09-24） | 数量 |
 | --- | ---: |
@@ -76,6 +76,8 @@ print(quote["content"], "——", quote["operator"]["name"])
 | `GET /api/v1/quotes/today` | 同一天、同一筛选条件返回固定台词 | `operator`、`title`，均可选 |
 | `GET /api/v1/operators` | 搜索干员 | `q`、`limit`，均可选 |
 | `GET /api/v1/categories` | 列出台词场景与数量 | 无 |
+| `GET /api/v1/birthdays` | 查询干员生日档案，附带对应立绘 | `operator`、`date`（`MM-DD`），均可选 |
+| `GET /api/v1/birthdays/today` | 返回北京时间当天过生日的干员及立绘 | `operator`，可选 |
 | `GET /api/v1/cg/random` | 随机返回一张剧情 CG 的图片链接 | 无 |
 | `GET /api/v1/status` | 返回服务和数据索引状态 | 无 |
 | `GET /api/v1/wallpapers/random` | 壁纸预留接口；公开 Worker 当前返回 503 | `orientation`，可选 |
@@ -179,6 +181,68 @@ curl -sS 'https://arkoto.me/api/v1/categories'
 
 返回的 `data` 数组中，每项都有 `title` 和 `line_count`。`title` 可以直接用于台词接口的同名参数。当前索引中 `任命助理` 的 `line_count` 为 483；实际场景和数量以接口为准。
 
+## 干员生日与生日当天立绘
+
+生日来自国服干员的基础档案，单独保存为轻量索引。2026-10-15 的导入收录 424 份生日档案，其中 403 份有明确月日。档案没有公开或不能确定日期时，保留原文，不推算生日。
+
+```bash
+# 获取今天过生日的干员及对应立绘（北京时间）
+curl -sS 'https://arkoto.me/api/v1/birthdays/today'
+
+# 查询某位干员的生日
+curl -sS --get 'https://arkoto.me/api/v1/birthdays' \
+  --data-urlencode 'operator=阿米娅'
+
+# 获取指定月日过生日的干员
+curl -sS 'https://arkoto.me/api/v1/birthdays?date=12-23'
+```
+
+`/birthdays` 的 `operator` 接受精确名称或 ID，`date` 接受补足两位的有效 `MM-DD`，例如 `12-23` 或 `02-29`。两个参数可以组合使用；都不传则返回全部已收录的生日档案。`/birthdays/today` 可以按干员筛选，但不能传 `date`；指定日期请用 `/birthdays`。
+
+响应结构为：
+
+```json
+{
+  "date": "12-23",
+  "timezone": "Asia/Shanghai",
+  "data": [
+    {
+      "operator": { "id": "char_002_amiya", "name": "阿米娅" },
+      "birthday": { "month": 12, "day": 23, "text": "12月23日" },
+      "illustration": {
+        "type": "operator_portrait",
+        "url": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/refs/heads/cn/assets/dyn/arts/charportraits/char_002_amiya_2.png",
+        "source": "https://github.com/ArknightsAssets/ArknightsAssets2/tree/cn/assets/dyn/arts/charportraits",
+        "filename": "char_002_amiya_2.png"
+      },
+      "source": "https://github.com/ArknightsAssets/ArknightsGamedata/blob/3aaa25b649fed5dedad9527602826dc487ea07d8/cn/gamedata/excel/handbook_info_table.json"
+    }
+  ],
+  "imported_at": "生日索引的同步时间，以实际响应为准"
+}
+```
+
+上例中阿米娅的生日与立绘已从数据核对；`imported_at` 用说明文字代替动态时间。今日接口的 `date` 为北京时间 `YYYY-MM-DD`；指定日期查询为 `MM-DD`；不筛选日期时为 `null`。
+
+未公开的生日返回 `{"month": null, "day": null, "text": "档案原文"}`，不会进入今日或日期筛选结果。找不到匹配干员或当天无人生日时，返回 `200` 和空 `data` 数组。不同干员 ID 的异格档案分别展示。`illustration` 与台词接口使用相同结构，缺图为 `null`，图片仍由第三方来源托管。
+
+网页示例：
+
+```js
+const response = await fetch("https://arkoto.me/api/v1/birthdays/today");
+if (!response.ok) throw new Error(`Arkoto: ${response.status}`);
+const result = await response.json();
+for (const item of result.data) {
+  console.log(item.operator.name, item.birthday.text, item.illustration?.url);
+}
+```
+
+更新生日索引（独立于语音数据库，不需要重新导入 D1）：
+
+```bash
+python3 -m scripts.update_birthday_index --download
+```
+
 ## 剧情 CG 与状态
 
 ```bash
@@ -188,7 +252,7 @@ curl -sS 'https://arkoto.me/api/v1/status'
 
 `/cg/random` 返回一个 `data` 对象，包含 `type`（`story_cg`）、`url`、`source` 和 `filename`。`url` 是第三方 GitHub Raw 图片链接。CG 是独立图库，不表示它对应某条台词或某位干员。
 
-`/status` 返回 `status`、`lines`、`operators`、`portraits`、`story_cg`、`wallpapers`、`imported_at` 和 `source`。`imported_at` 是数据导入时间，不是请求时间。
+`/status` 返回 `status`、`lines`、`operators`、`portraits`、`story_cg`、`wallpapers`、`imported_at` 和 `source`，以及明确公开生日的档案数 `birthdays` 与生日索引同步时间 `birthdays_imported_at`。`imported_at` 是台词数据导入时间，不是请求时间。
 
 `/wallpapers/random` 是预留路径。公开 Worker 当前无壁纸库：合法请求返回 `503 wallpaper_catalog_unavailable`；`orientation` 只接受 `horizontal` 或 `vertical`，其他值返回 `400 invalid_orientation`。本地 Python 服务若配置 `data/wallpapers.json`，行为可能不同。
 
@@ -198,12 +262,12 @@ curl -sS 'https://arkoto.me/api/v1/status'
 
 | HTTP 状态 | `error` | 常见原因 |
 | --- | --- | --- |
-| 400 | `invalid_limit`、`invalid_orientation` | 查询参数格式不符合要求 |
+| 400 | `invalid_limit`、`invalid_orientation`、`invalid_date`、`date_not_allowed` | 查询参数格式不符合要求，或向今日生日传入了 `date` |
 | 404 | `no_matching_quote`、`not_found` | 台词筛选无结果，或路径不存在 |
 | 405 | `method_not_allowed` | 使用了不支持的请求方法 |
 | 503 | `catalog_out_of_sync`、`cg_catalog_unavailable`、`wallpaper_catalog_unavailable`、`service_unavailable` | 数据索引不同步、资源不可用或服务异常 |
 
-公开 Worker 对 `/status` 设置 `Cache-Control: public, max-age=60`，对 `/categories` 设置 `public, max-age=3600`；其他当前接口为 `no-store`。客户端请处理超时、非 2xx 响应与外部图片加载失败。
+公开 Worker 对 `/status` 设置 `Cache-Control: public, max-age=60`，对 `/categories` 和 `/birthdays` 设置 `public, max-age=3600`；其他当前接口（包括 `/birthdays/today`）为 `no-store`。客户端请处理超时、非 2xx 响应与外部图片加载失败。
 
 ## 本地运行
 
@@ -232,6 +296,7 @@ Worker 本地开发默认地址为 `http://127.0.0.1:8787/`；首次运行前仍
 ## 数据来源与项目结构
 
 - 台词和干员名：[ArknightsGamedata](https://github.com/ArknightsAssets/ArknightsGamedata) 国服数据。
+- 生日：[国服干员基础档案](https://github.com/ArknightsAssets/ArknightsGamedata/blob/3aaa25b649fed5dedad9527602826dc487ea07d8/cn/gamedata/excel/handbook_info_table.json)。只提取生日原文与有效月日，不将整份人物档案写入生日索引。
 - 干员立绘文件名：[ArknightsAssets2](https://github.com/ArknightsAssets/ArknightsAssets2/tree/cn/assets/dyn/arts/charportraits)。
 - 剧情 CG 文件名：[Aceship/Arknight-Images](https://github.com/Aceship/Arknight-Images/tree/main/avg/images)。
 
@@ -257,4 +322,7 @@ python3 -m unittest discover -s tests -v
 python3 -m py_compile server.py arkoto/*.py scripts/*.py
 node --check public/app.js
 node --check src/worker.js
+node --check public/birthdays.js
+node --check public/api-builder.js
+node --test tests/worker.test.mjs
 ```
