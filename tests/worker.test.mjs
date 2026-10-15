@@ -69,8 +69,9 @@ test("new endpoints keep CORS, HEAD, and read-only method behavior", async () =>
 
 test("image cache only fetches indexed files from fixed sources", async (t) => {
   let fetches = 0;
-  t.mock.method(globalThis, "fetch", async (url) => {
+  t.mock.method(globalThis, "fetch", async (url, options) => {
     fetches++;
+    assert.equal(options.redirect, "manual");
     assert.equal(url, "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/refs/heads/cn/assets/dyn/arts/charportraits/char_002_amiya_2.png");
     return new Response("image-bytes", { headers: { "Content-Type": "image/png" } });
   });

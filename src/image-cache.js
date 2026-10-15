@@ -38,10 +38,14 @@ export async function serveImage(request, context) {
   let upstream;
   try {
     upstream = await fetch(source.base + encodeURIComponent(filename), {
-      method: request.method, signal: AbortSignal.timeout(15000), redirect: "error",
+      method: request.method, signal: AbortSignal.timeout(15000), redirect: "manual",
     });
-  } catch (_) { return fail(502); }
+  } catch (error) {
+    console.warn("Image source fetch failed", error.name, error.message);
+    return fail(502);
+  }
   if (!upstream.ok || !/^image\/(png|jpeg|webp|avif)(;|$)/i.test(upstream.headers.get("Content-Type") || "")) {
+    console.warn("Image source rejected", upstream.status, upstream.headers.get("Content-Type"));
     await upstream.body?.cancel();
     return fail(502);
   }
