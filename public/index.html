@@ -10,6 +10,7 @@
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="stylesheet" href="/styles.css" />
     <script src="/app.js" defer></script>
+    <script src="/hero.js" defer></script>
     <script src="/birthdays.js" defer></script>
   </head>
   <body>
@@ -38,14 +39,21 @@
             <a class="button button-secondary" href="/docs.html">查看接口文档 <span aria-hidden="true">→</span></a>
           </div>
         </div>
-        <div class="hero-art" aria-hidden="true">
-          <div class="orbital orbital-outer"></div>
-          <div class="orbital orbital-inner"></div>
-          <div class="hero-disc"><span class="disc-north">A</span><span class="disc-south">K</span></div>
-          <div class="orbit-label orbit-label-top">ORIGIN / TERRA</div>
-          <div class="orbit-label orbit-label-bottom">SIGNAL 001.09</div>
-          <div class="crosshair crosshair-one">+</div><div class="crosshair crosshair-two">+</div>
-        </div>
+        <article class="hero-transmission" aria-label="随机干员台词与立绘">
+          <img id="hero-background" class="hero-background" alt="" hidden />
+          <img id="hero-portrait" class="hero-portrait" alt="" hidden />
+          <div class="hero-shade" aria-hidden="true"></div>
+          <div class="hero-transmission-top"><span><i class="live-dot"></i>来自泰拉的讯息</span><button id="hero-refresh" class="round-button" type="button" aria-label="换一位干员、一句台词和一张背景">↻</button></div>
+          <div class="hero-message">
+            <span class="hero-quote-mark" aria-hidden="true">“</span>
+            <blockquote id="hero-quote" aria-live="polite">正在接收来自泰拉的讯息……</blockquote>
+            <div class="hero-credit"><strong id="hero-operator">—</strong><span id="hero-title"></span></div>
+          </div>
+          <div class="hero-transmission-footer">
+            <p id="hero-status" role="status">剧情 CG 背景独立随机，可能包含剧透。</p>
+            <div class="hero-sources"><a id="hero-portrait-source" target="_blank" rel="noopener noreferrer" hidden>立绘来源 ↗</a><a id="hero-background-source" target="_blank" rel="noopener noreferrer" hidden>背景来源 ↗</a></div>
+          </div>
+        </article>
         <div class="hero-index" aria-hidden="true">01 / 04</div>
       </section>
 
@@ -169,7 +177,7 @@
         <div><strong>ARKOTO</strong><p>一条来自泰拉的讯息。</p></div>
         <div>本站为非官方玩家项目。<br />《明日方舟》相关内容归其权利人所有。<br />本站仅供非商业交流，禁止将本站内容用于商业用途。<br /><span id="data-updated">数据同步时间：—</span></div>
         <div class="footer-links">
-          <a href="https://sites.google.com/nyu.edu/ethanwu/home" target="_blank" rel="noopener noreferrer">作者主页 ↗</a>
+          <a href="https://github.com/ethan527w" target="_blank" rel="noopener noreferrer">作者主页 ↗</a>
           <a href="#top">返回顶部 ↑</a>
         </div>
       </div>
