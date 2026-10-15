@@ -4,6 +4,7 @@ import catalog from "../data/catalog_index.json";
 import images from "../data/image_index.json";
 import birthdays from "../data/birthday_index.json";
 import { shanghaiDate, validBirthdayDate } from "./dates.js";
+import { serveImage } from "./image-cache.js";
 
 const PORTRAIT_SOURCE = "https://github.com/ArknightsAssets/ArknightsAssets2/tree/cn/assets/dyn/arts/charportraits";
 const PORTRAIT_BASE = "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/refs/heads/cn/assets/dyn/arts/charportraits/";
@@ -179,10 +180,11 @@ async function handleApi(request, env, url) {
 }
 
 export default {
-  async fetch(request, env) {
+  async fetch(request, env, context) {
     const url = new URL(request.url);
     if (!url.pathname.startsWith("/api/")) return env.ASSETS.fetch(request);
     try {
+      if (url.pathname.startsWith("/api/v1/images/")) return await serveImage(request, context);
       return await handleApi(request, env, url);
     } catch (error) {
       console.error("Arkoto API failure", error);

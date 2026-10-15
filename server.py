@@ -9,11 +9,11 @@ import mimetypes
 from datetime import datetime
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
-from urllib.parse import parse_qs, unquote, urlsplit
+from urllib.parse import parse_qs, quote, unquote, urlsplit
 from zoneinfo import ZoneInfo
 
 from arkoto.catalog import Catalog
-from arkoto.images import ImageCatalog
+from arkoto.images import ImageCatalog, PORTRAIT_BASE, CG_BASE
 from arkoto.birthdays import BirthdayCatalog, validate_birthday_date
 
 
@@ -83,6 +83,20 @@ def create_handler(catalog: Catalog, wallpapers: list[dict], images: ImageCatalo
             def first(name: str) -> str:
                 return query.get(name, [""])[0].strip()[:100]
 
+            if path.startswith("/api/v1/images/"):
+                parts = path.split("/")
+                group = parts[4] if len(parts) == 6 else ""
+                filename = unquote(parts[5]) if len(parts) == 6 else ""
+                files = images.portraits.values() if group == "portraits" else images.cg_files if group == "cg" else []
+                if filename not in files:
+                    self.send_json(404, {"error": "not_found"})
+                    return
+                # The Python preview uses the original source; edge caching runs in the Worker.
+                self.send_response(302)
+                self.send_common_headers("text/plain", 0)
+                self.send_header("Location", (PORTRAIT_BASE if group == "portraits" else CG_BASE) + quote(filename, safe=""))
+                self.end_headers()
+                return
             if path == "/api/v1/status":
                 self.send_json(200, {
                     "status": "ok",

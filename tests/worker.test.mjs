@@ -66,3 +66,71 @@ test("new endpoints keep CORS, HEAD, and read-only method behavior", async () =>
   assert.equal((await call("/api/v1/birthdays", "OPTIONS")).status, 204);
   assert.equal((await call("/api/v1/birthdays", "POST")).status, 405);
 });
+
+test("image cache only fetches indexed files from fixed sources", async (t) => {
+  let fetches = 0;
+  t.mock.method(globalThis, "fetch", async (url) => {
+    fetches++;
+    assert.equal(url, "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/refs/heads/cn/assets/dyn/arts/charportraits/char_002_amiya_2.png");
+    return new Response("image-bytes", { headers: { "Content-Type": "image/png" } });
+  });
+  for (const path of ["/api/v1/images/portraits/unknown.png", "/api/v1/images/cg/https%3A%2F%2Fevil.test", "/api/v1/images/portraits/%ZZ", "/api/v1/images/other/test.png"]) {
+    assert.equal((await call(path)).status, 404);
+  }
+  assert.equal(fetches, 0);
+  const response = await call("/api/v1/images/portraits/char_002_amiya_2.png");
+  assert.equal(response.status, 200);
+  assert.equal(response.headers.get("X-Arkoto-Cache"), "MISS");
+  assert.equal(response.headers.get("Access-Control-Allow-Origin"), "*");
+  assert.equal(await response.text(), "image-bytes");
+  assert.equal(fetches, 1);
+});
+
+test("image GET populates cache, canonical query keys and HEAD reuse it", async (t) => {
+  const saved = new Map();
+  const pending = [];
+  const original = globalThis.caches;
+  globalThis.caches = { default: {
+    match: async (key) => saved.get(key.url)?.clone(),
+    put: async (key, response) => { saved.set(key.url, new Response(await response.arrayBuffer(), response)); },
+  } };
+  t.after(() => { if (original === undefined) delete globalThis.caches; else globalThis.caches = original; });
+  let fetches = 0;
+  t.mock.method(globalThis, "fetch", async () => {
+    fetches++;
+    return new Response("png-bytes", { headers: { "Content-Type": "image/png", ETag: '"v1"' } });
+  });
+  const path = "https://arkoto.test/api/v1/images/cg/avg_ac15_5.png";
+  const miss = await worker.fetch(new Request(path + "?ignored=1"), {}, { waitUntil: (promise) => pending.push(promise) });
+  assert.equal(await miss.text(), "png-bytes");
+  await Promise.all(pending);
+  const hit = await worker.fetch(new Request(path + "?ignored=2"), {});
+  assert.equal(hit.headers.get("X-Arkoto-Cache"), "HIT");
+  assert.equal(hit.headers.get("ETag"), '"v1"');
+  assert.match(hit.headers.get("Cache-Control"), /max-age=86400/);
+  assert.equal(await hit.text(), "png-bytes");
+  const head = await worker.fetch(new Request(path, { method: "HEAD" }), {});
+  assert.equal(head.headers.get("X-Arkoto-Cache"), "HIT");
+  assert.equal(await head.text(), "");
+  assert.equal(fetches, 1);
+});
+
+test("image failures are not cached and HEAD misses never cache an empty GET", async (t) => {
+  const original = globalThis.caches;
+  let writes = 0;
+  globalThis.caches = { default: { match: async () => undefined, put: async () => { writes++; } } };
+  t.after(() => { if (original === undefined) delete globalThis.caches; else globalThis.caches = original; });
+  const path = "https://arkoto.test/api/v1/images/cg/avg_ac15_5.png";
+  const context = { waitUntil: (promise) => promise };
+  const mock = t.mock.method(globalThis, "fetch", async () => new Response("not an image", { headers: { "Content-Type": "text/html" } }));
+  assert.equal((await worker.fetch(new Request(path), {}, context)).status, 502);
+  mock.mock.mockImplementation(async () => { throw new Error("offline"); });
+  const failed = await worker.fetch(new Request(path), {}, context);
+  assert.equal(failed.status, 502);
+  assert.equal(failed.headers.get("Cache-Control"), "no-store");
+  mock.mock.mockImplementation(async () => new Response(null, { headers: { "Content-Type": "image/png" } }));
+  assert.equal((await worker.fetch(new Request(path, { method: "HEAD" }), {}, context)).status, 200);
+  assert.equal(writes, 0);
+  assert.equal((await call("/api/v1/images/cg/avg_ac15_5.png", "POST")).status, 405);
+  assert.equal((await call("/api/v1/images/cg/avg_ac15_5.png", "OPTIONS")).status, 204);
+});

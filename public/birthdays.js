@@ -22,8 +22,7 @@
       const image = element("img");
       image.alt = `${item.operator.name}立绘`;
       image.loading = "lazy";
-      image.addEventListener("error", () => art.replaceChildren(fallback), { once: true });
-      image.src = item.illustration.url;
+      ArkotoImages.load(image, item.illustration, { onerror: () => art.replaceChildren(fallback) });
       art.append(image);
     } else art.append(fallback);
     const info = element("div", "", "birthday-card-info");

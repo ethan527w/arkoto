@@ -10,10 +10,11 @@ function showPortrait(illustration) {
   image.onerror = null;
   image.removeAttribute("src");
   if (!illustration) return;
-  image.onload = () => { image.hidden = false; source.hidden = false; };
-  image.onerror = () => { image.hidden = true; source.hidden = true; };
   source.href = illustration.source;
-  image.src = illustration.url;
+  ArkotoImages.load(image, illustration, {
+    onload: () => { image.hidden = false; source.hidden = false; },
+    onerror: () => { image.hidden = true; source.hidden = true; },
+  });
 }
 
 function currentEndpoint() {
@@ -72,9 +73,10 @@ async function fetchCg() {
     if (!response.ok) throw new Error("剧情图片暂不可用");
     byId("cg-source").href = result.data.source;
     byId("cg-filename").textContent = result.data.filename;
-    image.onload = () => { image.hidden = false; placeholder.hidden = true; };
-    image.onerror = () => { placeholder.textContent = "图片暂时无法加载，换一张试试。"; };
-    image.src = result.data.url;
+    ArkotoImages.load(image, result.data, {
+      onload: () => { image.hidden = false; placeholder.hidden = true; },
+      onerror: () => { placeholder.textContent = "图片暂时无法加载，换一张试试。"; },
+    });
   } catch (error) {
     placeholder.textContent = error.message;
     byId("cg-filename").textContent = error.message;
@@ -119,9 +121,7 @@ async function loadPageData() {
   } catch (_) {
     byId("data-updated").textContent = "数据同步状态暂不可用";
   }
-  await loadOperators();
-  await fetchQuote();
-  fetchCg();
+  loadOperators();
 }
 
 byId("mode-random").addEventListener("click", () => {
@@ -161,3 +161,5 @@ byId("copy-api").addEventListener("click", async () => {
 });
 
 loadPageData();
+ArkotoImages.whenNear(byId("explore"), fetchQuote);
+ArkotoImages.whenNear(byId("cg"), fetchCg);

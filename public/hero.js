@@ -1,6 +1,6 @@
 (() => {
   const get = (id) => document.getElementById(id);
-  const note = "剧情 CG 背景独立随机，可能包含剧透。";
+  const note = "剧情 CG 背景独立随机。";
   let generation = 0;
   let currentRequest;
 
@@ -17,20 +17,19 @@
     if (!item?.url) return;
     // Preload each selection separately so a late image cannot replace a newer operator.
     const preload = new Image();
-    preload.onload = () => {
+    ArkotoImages.load(preload, item, { priority: "high", onload: () => {
       if (token !== generation) return;
       const image = get(imageId);
       image.alt = alt;
-      image.src = item.url;
+      image.decoding = "async";
+      image.src = preload.src;
       image.hidden = false;
       if (item.source) {
         const source = get(sourceId);
         source.href = item.source;
         source.hidden = false;
       }
-    };
-    preload.onerror = () => { /* The quote and gradient remain usable without external images. */ };
-    preload.src = item.url;
+    } });
   }
 
   async function fetchJSON(path, signal) {
@@ -48,7 +47,7 @@
     get("hero-refresh").disabled = true;
     get("hero-status").textContent = "正在接收新的讯息……";
     clearImage("hero-portrait", "hero-portrait-source");
-    clearImage("hero-background", "hero-background-source");
+    // Keep the current CG visible until its replacement has loaded.
     const results = await Promise.allSettled([
       fetchJSON("/api/v1/quotes/random", controller.signal).then((quote) => {
         if (token !== generation) return;

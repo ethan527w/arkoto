@@ -267,7 +267,9 @@ curl -sS 'https://arkoto.me/api/v1/status'
 | 405 | `method_not_allowed` | 使用了不支持的请求方法 |
 | 503 | `catalog_out_of_sync`、`cg_catalog_unavailable`、`wallpaper_catalog_unavailable`、`service_unavailable` | 数据索引不同步、资源不可用或服务异常 |
 
-公开 Worker 对 `/status` 设置 `Cache-Control: public, max-age=60`，对 `/categories` 和 `/birthdays` 设置 `public, max-age=3600`；其他当前接口（包括 `/birthdays/today`）为 `no-store`。客户端请处理超时、非 2xx 响应与外部图片加载失败。
+公开 Worker 对 `/status` 设置 `Cache-Control: public, max-age=60`，对 `/categories` 和 `/birthdays` 设置 `public, max-age=3600`；其余 JSON 接口（包括 `/birthdays/today`）为 `no-store`。客户端请处理超时、非 2xx 响应与外部图片加载失败。
+
+网页通过 `/api/v1/images/portraits/{filename}` 和 `/api/v1/images/cg/{filename}` 加载已收录图片，文件名需要 URL 编码。Worker 以流式响应返回原图，浏览器缓存一天、边缘缓存七天，`X-Arkoto-Cache` 标明 `HIT` 或 `MISS`；上游失败返回 `502`，未收录文件返回 `404`，错误不缓存。首次未命中仍需从 GitHub 获取原图。原有 JSON 中的 `url`、`source` 保持原样，网页在缓存路径失败时回退原始链接。Python 本地预览对这些图片路径重定向到原始链接。
 
 ## 本地运行
 
